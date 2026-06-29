@@ -1,0 +1,8 @@
+{
+  "name": "prithjyo-listings",
+  "version": "1.0.0",
+  "dependencies": {
+    "cloudinary": "^1.41.3",
+    "formidable": "^2.1.2"
+  }
+}
