@@ -174,12 +174,11 @@
     const btn = document.getElementById('upload'); btn.disabled=true;
     document.getElementById('output').classList.add('hidden');
 
-    const gallery=[]; let cover=null;
+    const gallery=[];
     try{
       for(let i=0;i<photos.length;i++){
         setStatus('Uploading photo '+(i+1)+' of '+photos.length+'…');
         const u = await uploadOne(photos[i], folder, false);
-        if(i===0) cover=u;
         gallery.push({type:'image', url:u});
       }
       if(video){
@@ -187,9 +186,10 @@
         const vu = await uploadOne(video, folder, true);
         gallery.push({type:'video', url:vu});
       }
-      let s = "'"+code+"':{\n  cover:"+(cover?("'"+cover+"'"):'null')+",\n  gallery:[\n";
+      // cover:null matches the deck's existing MEDIA_DB format (gallery[0] is the card face)
+      let s = "  '"+code+"':{\n    cover:null,\n    gallery:[\n";
       s += gallery.map(g=>"    {type:'"+g.type+"',url:'"+g.url+"'}").join(',\n');
-      s += "\n  ]\n},";
+      s += "\n  ]},";
       document.getElementById('snippet').value = s;
       document.getElementById('output').classList.remove('hidden');
       setStatus('Done — '+gallery.length+' item(s) uploaded to '+folder+'.', 'ok');
