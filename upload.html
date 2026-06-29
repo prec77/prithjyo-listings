@@ -3,391 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prithjyo — Photo Upload</title>
+<title>Prithjyo — Listing Uploader</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --navy:#0F1E2E;
-  --navy-mid:#1A2E42;
-  --navy-light:#243D55;
-  --cream:#F5F0E8;
-  --gold:#C9A84C;
-  --green:#2D7A4F;
-  --green-bg:#EAF4EE;
-  --red:#C0392B;
-  --text-sec:#4A6070;
-  --text-muted:#7A8E9A;
-  --white:#FFFFFF;
-}
-html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:var(--navy);color:var(--white);}
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap');
-
-/* ── LOCK SCREEN ── */
-#lock{
-  position:fixed;inset:0;background:var(--navy);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  z-index:1000;gap:20px;padding:24px;
-}
-.lock-logo{font-family:'DM Serif Display',serif;font-size:22px;color:var(--gold);letter-spacing:.08em;margin-bottom:8px;}
-.lock-title{font-size:15px;color:var(--text-muted);margin-bottom:4px;}
-.lock-input{
-  width:100%;max-width:320px;padding:14px 16px;
-  background:var(--navy-mid);border:1.5px solid var(--navy-light);
-  border-radius:12px;color:var(--white);font-size:16px;
-  outline:none;transition:border-color .15s;
-  font-family:inherit;letter-spacing:.12em;text-align:center;
-}
-.lock-input:focus{border-color:var(--gold);}
-.lock-btn{
-  width:100%;max-width:320px;padding:14px;
-  background:var(--gold);color:var(--navy);
-  border:none;border-radius:12px;font-size:15px;font-weight:700;
-  cursor:pointer;font-family:inherit;transition:opacity .15s;
-}
-.lock-btn:active{opacity:.85;}
-.lock-error{font-size:13px;color:var(--red);min-height:18px;}
-
-/* ── MAIN APP ── */
-#app{display:none;max-width:640px;margin:0 auto;padding:32px 20px 60px;}
-
-.logo{font-family:'DM Serif Display',serif;font-size:18px;color:var(--gold);letter-spacing:.08em;margin-bottom:6px;}
-.page-title{font-family:'DM Serif Display',serif;font-size:28px;color:var(--cream);margin-bottom:6px;}
-.page-sub{font-size:13px;color:var(--text-muted);margin-bottom:36px;line-height:1.6;}
-
-/* ── FORM ── */
-.field{margin-bottom:20px;}
-.label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:block;}
-.input{
-  width:100%;padding:13px 14px;
-  background:var(--navy-mid);border:1.5px solid var(--navy-light);
-  border-radius:12px;color:var(--white);font-size:15px;font-weight:500;
-  outline:none;transition:border-color .15s;font-family:inherit;
-}
-.input:focus{border-color:var(--gold);}
-.input::placeholder{color:var(--text-muted);}
-
-/* ── DROP ZONE ── */
-.drop-zone{
-  border:2px dashed var(--navy-light);border-radius:16px;
-  padding:40px 24px;text-align:center;cursor:pointer;
-  transition:all .2s;background:var(--navy-mid);
-  position:relative;
-}
-.drop-zone.drag-over{border-color:var(--gold);background:rgba(201,168,76,.06);}
-.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.dz-icon{font-size:36px;margin-bottom:12px;}
-.dz-title{font-size:15px;font-weight:600;color:var(--cream);margin-bottom:4px;}
-.dz-sub{font-size:12px;color:var(--text-muted);}
-
-/* ── PHOTO PREVIEW GRID ── */
-.photo-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
-  gap:10px;margin-top:16px;
-}
-.photo-item{
-  position:relative;border-radius:10px;overflow:hidden;
-  aspect-ratio:4/3;background:var(--navy-light);
-}
-.photo-item img{width:100%;height:100%;object-fit:cover;display:block;}
-.photo-badge{
-  position:absolute;top:6px;left:6px;
-  background:rgba(15,30,46,.85);color:var(--gold);
-  font-size:10px;font-weight:700;padding:3px 7px;border-radius:8px;
-}
-.photo-remove{
-  position:absolute;top:6px;right:6px;
-  background:rgba(192,57,43,.9);color:white;
-  border:none;border-radius:50%;width:22px;height:22px;
-  font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  line-height:1;
-}
-.photo-order{
-  position:absolute;bottom:6px;left:6px;right:6px;
-  display:flex;gap:4px;justify-content:center;
-}
-.order-btn{
-  background:rgba(15,30,46,.85);color:var(--cream);
-  border:none;border-radius:6px;padding:3px 8px;font-size:11px;
-  cursor:pointer;font-family:inherit;
-}
-.order-btn:active{background:var(--gold);color:var(--navy);}
-
-/* ── ORDER HINT ── */
-.order-hint{
-  font-size:12px;color:var(--text-muted);margin-top:10px;line-height:1.6;
-  background:rgba(255,255,255,.04);border-radius:10px;padding:12px 14px;
-}
-.order-hint strong{color:var(--cream);}
-
-/* ── UPLOAD BTN ── */
-.upload-btn{
-  width:100%;padding:16px;margin-top:24px;
-  background:var(--gold);color:var(--navy);
-  border:none;border-radius:14px;font-size:16px;font-weight:700;
-  cursor:pointer;font-family:inherit;transition:opacity .15s;
-  letter-spacing:.01em;
-}
-.upload-btn:disabled{opacity:.35;cursor:default;}
-.upload-btn:not(:disabled):active{opacity:.85;}
-
-/* ── PROGRESS ── */
-.progress-wrap{margin-top:20px;display:none;}
-.progress-label{font-size:13px;color:var(--text-muted);margin-bottom:8px;}
-.progress-bar{height:4px;background:var(--navy-light);border-radius:2px;overflow:hidden;}
-.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .3s ease;width:0%;}
-
-/* ── RESULT ── */
-.result{
-  margin-top:24px;display:none;
-  background:var(--navy-mid);border:1px solid var(--navy-light);
-  border-radius:14px;padding:20px;
-}
-.result-title{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase;}
-.result-code{
-  background:rgba(0,0,0,.3);border-radius:10px;padding:14px;
-  font-family:'Courier New',monospace;font-size:11px;color:var(--cream);
-  white-space:pre-wrap;word-break:break-all;line-height:1.6;
-  max-height:200px;overflow-y:auto;
-}
-.copy-btn{
-  margin-top:12px;padding:10px 20px;
-  background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);
-  color:var(--gold);border-radius:10px;font-size:13px;font-weight:600;
-  cursor:pointer;font-family:inherit;transition:all .15s;
-}
-.copy-btn:active{background:var(--gold);color:var(--navy);}
-.result-note{font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.6;}
-
-/* ── STATUS MESSAGES ── */
-.status{font-size:13px;margin-top:12px;min-height:20px;line-height:1.5;}
-.status.error{color:var(--red);}
-.status.success{color:#4CAF50;}
-.status.info{color:var(--text-muted);}
-
-/* ── DIVIDER ── */
-.divider{border:none;border-top:1px solid var(--navy-light);margin:28px 0;}
+  :root{ --bg:#0f1115; --card:#1a1d24; --line:#2a2e38; --text:#e8eaed; --muted:#9aa0ab; --accent:#c8a35b; --ok:#3fb27f; --err:#e2615b; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 18px 80px}
+  h1{font-size:22px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+  label{display:block;font-size:13px;color:var(--muted);margin:0 0 8px;text-transform:uppercase;letter-spacing:.6px}
+  code{background:#0c0e12;padding:1px 5px;border-radius:5px;font-size:.92em}
+  input[type=text],input[type=password]{width:100%;padding:12px 14px;background:#0c0e12;border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:15px}
+  input[type=text]::placeholder{color:#5b616c}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px}
+  .filebtn{display:inline-block;padding:11px 16px;background:#0c0e12;border:1px dashed var(--line);border-radius:10px;color:var(--text);cursor:pointer;font-size:14px}
+  .filebtn input{display:none}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px;margin-top:14px}
+  .thumb{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--line);aspect-ratio:1/1;background:#000}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb .idx{position:absolute;top:4px;left:4px;background:rgba(0,0,0,.7);color:#fff;font-size:11px;padding:2px 6px;border-radius:6px}
+  .thumb .rm{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);color:#fff;border:none;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:13px;line-height:1}
+  .videoTag{margin-top:12px;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);background:#0c0e12;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .videoTag button{margin-left:auto;background:none;border:none;color:var(--err);cursor:pointer;font-size:13px}
+  .go{width:100%;padding:14px;background:var(--accent);color:#1a1306;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;margin-top:8px}
+  .go:disabled{opacity:.5;cursor:not-allowed}
+  .status{margin-top:14px;font-size:14px;color:var(--muted);min-height:20px}
+  .status.ok{color:var(--ok)}
+  .status.err{color:var(--err)}
+  textarea{width:100%;min-height:200px;background:#0c0e12;border:1px solid var(--line);border-radius:10px;color:#cde8d6;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;padding:14px;margin-top:12px}
+  .copy{padding:10px 16px;background:#0c0e12;border:1px solid var(--line);border-radius:10px;color:var(--text);cursor:pointer;font-size:14px;margin-top:10px;margin-right:8px}
+  .gate{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:10;padding:18px}
+  .gate .box{width:300px}
+  .hidden{display:none}
 </style>
 </head>
 <body>
 
-<!-- LOCK SCREEN -->
-<div id="lock">
-  <div class="lock-logo">Prithjyo</div>
-  <div class="lock-title">Internal Tool — Photo Upload</div>
-  <input class="lock-input" type="password" id="lock-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')unlock()">
-  <button class="lock-btn" onclick="unlock()">Enter</button>
-  <div class="lock-error" id="lock-error"></div>
+<div class="gate" id="gate">
+  <div class="box">
+    <h1>Prithjyo Uploader</h1>
+    <p class="sub">Enter password to continue</p>
+    <input type="password" id="pw" placeholder="Password" />
+    <button class="go" id="pwBtn" style="margin-top:12px">Enter</button>
+    <p class="status err" id="pwErr"></p>
+  </div>
 </div>
 
-<!-- MAIN APP -->
-<div id="app">
-  <div class="logo">Prithjyo</div>
-  <div class="page-title">Photo Upload</div>
-  <div class="page-sub">Upload photos for a listing. They go to Cloudinary and come back as URLs ready to inject into the swipe deck.</div>
+<div class="wrap hidden" id="app">
+  <h1>Listing Media Uploader</h1>
+  <p class="sub">Uploads photos + video straight to Cloudinary, then gives you the code block to paste into the deck.</p>
 
-  <div class="field">
-    <label class="label">Property Code</label>
-    <input class="input" type="text" id="prop-code" placeholder="e.g. BKJS-1B-022" oninput="this.value=this.value.toUpperCase()">
+  <div class="card">
+    <label>Property Code</label>
+    <input type="text" id="code" placeholder="e.g. LPWPDMM - 2 BHK - 002   or   BKJS-1B-003" />
+    <p class="hint">Type it <b>exactly</b> as it appears in the deck — this becomes the MEDIA_DB key. Cloudinary folder will be <code>prithjyo/&lt;code&gt;</code>.</p>
   </div>
 
-  <div class="field">
-    <label class="label">Photos</label>
-    <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input" accept="image/*" multiple onchange="handleFiles(this.files)">
-      <div class="dz-icon">📷</div>
-      <div class="dz-title">Drop photos here or tap to select</div>
-      <div class="dz-sub">JPG or PNG · Add in viewing order (cover first)</div>
-    </div>
-    <div class="photo-grid" id="photo-grid"></div>
-    <div class="order-hint" id="order-hint" style="display:none">
-      <strong>Photo order matters.</strong> Position 0 = cover (shown on card). Position 1 = hall/living. Position 2 = bedroom. Position 3 = kitchen. Position 4 = bathroom. Use the ← → buttons to reorder.
-    </div>
+  <div class="card">
+    <label>Photos &nbsp;(viewing order: 0 cover, 1 hall, 2 bedroom…)</label>
+    <label class="filebtn">+ Select photos
+      <input type="file" id="photos" accept="image/*" multiple />
+    </label>
+    <p class="hint">If your files are named 0, 1, 2… they auto-order. Cover = first.</p>
+    <div class="grid" id="thumbs"></div>
   </div>
 
-  <button class="upload-btn" id="upload-btn" onclick="uploadAll()" disabled>Upload to Cloudinary →</button>
-
-  <div class="progress-wrap" id="progress-wrap">
-    <div class="progress-label" id="progress-label">Uploading...</div>
-    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="card">
+    <label>Video &nbsp;(optional — added last)</label>
+    <label class="filebtn">+ Select video
+      <input type="file" id="video" accept="video/*" />
+    </label>
+    <div id="videoBox"></div>
   </div>
 
+  <button class="go" id="upload">Upload to Cloudinary</button>
   <div class="status" id="status"></div>
 
-  <div class="result" id="result">
-    <div class="result-title">✓ Ready to inject</div>
-    <div class="result-code" id="result-code"></div>
-    <button class="copy-btn" onclick="copyResult()">Copy code</button>
-    <div class="result-note">Paste this code to Claude and say: "Inject this into the swipe deck HTML." One GitHub upload and photos are live.</div>
+  <div class="card hidden" id="output">
+    <label>Paste this into MEDIA_DB in index.html</label>
+    <textarea id="snippet" readonly></textarea>
+    <button class="copy" id="copy">Copy to clipboard</button>
+    <button class="copy" id="reset">Start another listing</button>
   </div>
 </div>
 
 <script>
-// ── PASSWORD ──
-// Change this to whatever password you want
-const PASSWORD = 'prithjyo2026';
+  const CLOUD   = 'dayfllzwe';
+  const PRESET  = 'prithjyo_listings';
+  const PASSWORD = 'prithjyo2026';
 
-function unlock() {
-  const pw = document.getElementById('lock-pw').value;
-  if (pw === PASSWORD) {
-    document.getElementById('lock').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  } else {
-    document.getElementById('lock-error').textContent = 'Incorrect password.';
-    document.getElementById('lock-pw').value = '';
-    document.getElementById('lock-pw').focus();
+  // ---- password gate ----
+  const gate = document.getElementById('gate');
+  const app  = document.getElementById('app');
+  function tryPw(){
+    if(document.getElementById('pw').value === PASSWORD){
+      gate.classList.add('hidden'); app.classList.remove('hidden');
+    } else { document.getElementById('pwErr').textContent = 'Wrong password.'; }
   }
-}
+  document.getElementById('pwBtn').onclick = tryPw;
+  document.getElementById('pw').addEventListener('keydown', e=>{ if(e.key==='Enter') tryPw(); });
 
-// ── PHOTO MANAGEMENT ──
-let photos = []; // array of File objects in order
+  // ---- state ----
+  let photos = [];   // File[]
+  let video  = null; // File | null
+  const thumbs   = document.getElementById('thumbs');
+  const videoBox = document.getElementById('videoBox');
 
-const dropZone = document.getElementById('drop-zone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  handleFiles(e.dataTransfer.files);
-});
+  function naturalSort(a,b){
+    const na = parseInt(a.name,10), nb = parseInt(b.name,10);
+    if(!isNaN(na) && !isNaN(nb) && na!==nb) return na-nb;
+    return a.name.localeCompare(b.name, undefined, {numeric:true});
+  }
 
-function handleFiles(files) {
-  const newFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
-  photos = [...photos, ...newFiles];
-  renderGrid();
-  updateUploadBtn();
-}
-
-function removePhoto(idx) {
-  photos.splice(idx, 1);
-  renderGrid();
-  updateUploadBtn();
-}
-
-function movePhoto(idx, dir) {
-  const newIdx = idx + dir;
-  if (newIdx < 0 || newIdx >= photos.length) return;
-  [photos[idx], photos[newIdx]] = [photos[newIdx], photos[idx]];
-  renderGrid();
-}
-
-function renderGrid() {
-  const grid = document.getElementById('photo-grid');
-  const hint = document.getElementById('order-hint');
-  grid.innerHTML = '';
-  if (photos.length === 0) { hint.style.display = 'none'; return; }
-  hint.style.display = 'block';
-
-  photos.forEach((file, i) => {
-    const item = document.createElement('div');
-    item.className = 'photo-item';
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(file);
-    const badge = document.createElement('div');
-    badge.className = 'photo-badge';
-    badge.textContent = i === 0 ? 'Cover' : '#' + i;
-    const rem = document.createElement('button');
-    rem.className = 'photo-remove';
-    rem.innerHTML = '×';
-    rem.onclick = () => removePhoto(i);
-    const orderDiv = document.createElement('div');
-    orderDiv.className = 'photo-order';
-    if (i > 0) {
-      const left = document.createElement('button');
-      left.className = 'order-btn'; left.textContent = '←';
-      left.onclick = () => movePhoto(i, -1);
-      orderDiv.appendChild(left);
+  function renderThumbs(){
+    thumbs.innerHTML='';
+    photos.forEach((f,i)=>{
+      const div=document.createElement('div'); div.className='thumb';
+      const img=document.createElement('img'); img.src=URL.createObjectURL(f); img.onload=()=>URL.revokeObjectURL(img.src);
+      const idx=document.createElement('span'); idx.className='idx'; idx.textContent=i;
+      const rm=document.createElement('button'); rm.className='rm'; rm.textContent='×';
+      rm.onclick=()=>{ photos.splice(i,1); renderThumbs(); };
+      div.append(img,idx,rm); thumbs.append(div);
+    });
+  }
+  function renderVideo(){
+    videoBox.innerHTML='';
+    if(video){
+      const d=document.createElement('div'); d.className='videoTag';
+      d.append(document.createTextNode('🎬  '+video.name));
+      const b=document.createElement('button'); b.textContent='remove';
+      b.onclick=()=>{ video=null; document.getElementById('video').value=''; renderVideo(); };
+      d.append(b); videoBox.append(d);
     }
-    if (i < photos.length - 1) {
-      const right = document.createElement('button');
-      right.className = 'order-btn'; right.textContent = '→';
-      right.onclick = () => movePhoto(i, 1);
-      orderDiv.appendChild(right);
-    }
-    item.appendChild(img);
-    item.appendChild(badge);
-    item.appendChild(rem);
-    item.appendChild(orderDiv);
-    grid.appendChild(item);
+  }
+
+  document.getElementById('photos').addEventListener('change', e=>{
+    photos = photos.concat(Array.from(e.target.files));
+    photos.sort(naturalSort);
+    e.target.value='';
+    renderThumbs();
   });
-}
+  document.getElementById('video').addEventListener('change', e=>{
+    video = e.target.files[0] || null; renderVideo();
+  });
 
-function updateUploadBtn() {
-  const code = document.getElementById('prop-code').value.trim();
-  const btn = document.getElementById('upload-btn');
-  btn.disabled = !(code && photos.length > 0);
-}
-document.getElementById('prop-code').addEventListener('input', updateUploadBtn);
+  // ---- upload ----
+  function slug(code){ return code.trim().replace(/[\/\\]/g,'-').replace(/\s+/g,'-'); }
 
-// ── UPLOAD ──
-async function uploadAll() {
-  const code = document.getElementById('prop-code').value.trim();
-  if (!code || photos.length === 0) return;
+  async function uploadOne(file, folder, isVideo){
+    const url = 'https://api.cloudinary.com/v1_1/'+CLOUD+'/'+(isVideo?'video':'image')+'/upload';
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', PRESET);
+    fd.append('folder', folder);
+    const res  = await fetch(url, {method:'POST', body:fd});
+    const data = await res.json();
+    if(!res.ok || data.error){ throw new Error((data.error && data.error.message) || ('HTTP '+res.status)); }
+    return data.secure_url;
+  }
 
-  const btn = document.getElementById('upload-btn');
-  const progressWrap = document.getElementById('progress-wrap');
-  const progressFill = document.getElementById('progress-fill');
-  const progressLabel = document.getElementById('progress-label');
   const statusEl = document.getElementById('status');
-  const resultEl = document.getElementById('result');
-  const resultCode = document.getElementById('result-code');
+  function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className='status'+(cls?(' '+cls):''); }
 
-  btn.disabled = true;
-  progressWrap.style.display = 'block';
-  resultEl.style.display = 'none';
-  statusEl.className = 'status info';
-  statusEl.textContent = '';
+  document.getElementById('upload').onclick = async ()=>{
+    const code = document.getElementById('code').value.trim();
+    if(!code){ setStatus('Enter a property code first.', 'err'); return; }
+    if(photos.length===0 && !video){ setStatus('Add at least one photo or a video.', 'err'); return; }
+    const folder = 'prithjyo/'+slug(code);
+    const btn = document.getElementById('upload'); btn.disabled=true;
+    document.getElementById('output').classList.add('hidden');
 
-  const urls = [];
-  for (let i = 0; i < photos.length; i++) {
-    progressLabel.textContent = `Uploading photo ${i + 1} of ${photos.length}...`;
-    progressFill.style.width = ((i / photos.length) * 100) + '%';
-
-    const formData = new FormData();
-    formData.append('file', photos[i]);
-    formData.append('code', code);
-    formData.append('index', i);
-
-    try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Upload failed');
-      urls.push(data.url);
-    } catch (err) {
-      statusEl.className = 'status error';
-      statusEl.textContent = `Failed on photo ${i + 1}: ${err.message}`;
-      btn.disabled = false;
-      progressWrap.style.display = 'none';
-      return;
+    const gallery=[]; let cover=null;
+    try{
+      for(let i=0;i<photos.length;i++){
+        setStatus('Uploading photo '+(i+1)+' of '+photos.length+'…');
+        const u = await uploadOne(photos[i], folder, false);
+        if(i===0) cover=u;
+        gallery.push({type:'image', url:u});
+      }
+      if(video){
+        setStatus('Uploading video… (this one can take a bit)');
+        const vu = await uploadOne(video, folder, true);
+        gallery.push({type:'video', url:vu});
+      }
+      let s = "'"+code+"':{\n  cover:"+(cover?("'"+cover+"'"):'null')+",\n  gallery:[\n";
+      s += gallery.map(g=>"    {type:'"+g.type+"',url:'"+g.url+"'}").join(',\n');
+      s += "\n  ]\n},";
+      document.getElementById('snippet').value = s;
+      document.getElementById('output').classList.remove('hidden');
+      setStatus('Done — '+gallery.length+' item(s) uploaded to '+folder+'.', 'ok');
+    }catch(err){
+      setStatus('Upload failed: '+err.message+'  — send Claude this exact message.', 'err');
+    }finally{
+      btn.disabled=false;
     }
-  }
+  };
 
-  progressFill.style.width = '100%';
-  progressLabel.textContent = 'All photos uploaded ✓';
-
-  // Build the MEDIA_DB entry
-  const galleryItems = urls.map((url, i) => `{type:'image',url:'${url}'}`).join(',\n    ');
-  const snippet = `  '${code}':{
-    cover:null,
-    gallery:[
-    ${galleryItems}
-  ]},`;
-
-  resultCode.textContent = snippet;
-  resultEl.style.display = 'block';
-  statusEl.className = 'status success';
-  statusEl.textContent = `${photos.length} photos uploaded successfully.`;
-
-  setTimeout(() => { progressWrap.style.display = 'none'; }, 1500);
-}
-
-function copyResult() {
-  const text = document.getElementById('result-code').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.copy-btn');
-    btn.textContent = 'Copied ✓';
-    setTimeout(() => btn.textContent = 'Copy code', 2000);
-  });
-}
+  document.getElementById('copy').onclick = ()=>{
+    const ta=document.getElementById('snippet'); ta.select();
+    navigator.clipboard.writeText(ta.value).then(()=>{
+      const c=document.getElementById('copy'); c.textContent='Copied ✓';
+      setTimeout(()=>c.textContent='Copy to clipboard',1500);
+    });
+  };
+  document.getElementById('reset').onclick = ()=>{
+    photos=[]; video=null;
+    document.getElementById('code').value='';
+    document.getElementById('video').value='';
+    renderThumbs(); renderVideo();
+    document.getElementById('output').classList.add('hidden');
+    setStatus('');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
 </script>
 </body>
 </html>
