@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prithjyo — Photo Upload</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0F1E2E;
+  --navy-mid:#1A2E42;
+  --navy-light:#243D55;
+  --cream:#F5F0E8;
+  --gold:#C9A84C;
+  --green:#2D7A4F;
+  --green-bg:#EAF4EE;
+  --red:#C0392B;
+  --text-sec:#4A6070;
+  --text-muted:#7A8E9A;
+  --white:#FFFFFF;
+}
+html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:var(--navy);color:var(--white);}
+
+/* ── VIDEO TAG ── */
+.video-tag{margin-top:14px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream);background:var(--navy-mid);border:1px solid var(--navy-light);border-radius:12px;padding:13px 14px;}
+.video-remove{margin-left:auto;background:none;border:none;color:var(--red);font-size:12px;cursor:pointer;font-family:inherit;}
+
+/* ── LOCK SCREEN ── */
+#lock{
+  position:fixed;inset:0;background:var(--navy);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:1000;gap:20px;padding:24px;
+}
+.lock-logo{font-family:'DM Serif Display',serif;font-size:22px;color:var(--gold);letter-spacing:.08em;margin-bottom:8px;}
+.lock-title{font-size:15px;color:var(--text-muted);margin-bottom:4px;}
+.lock-input{
+  width:100%;max-width:320px;padding:14px 16px;
+  background:var(--navy-mid);border:1.5px solid var(--navy-light);
+  border-radius:12px;color:var(--white);font-size:16px;
+  outline:none;transition:border-color .15s;
+  font-family:inherit;letter-spacing:.12em;text-align:center;
+}
+.lock-input:focus{border-color:var(--gold);}
+.lock-btn{
+  width:100%;max-width:320px;padding:14px;
+  background:var(--gold);color:var(--navy);
+  border:none;border-radius:12px;font-size:15px;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:opacity .15s;
+}
+.lock-btn:active{opacity:.85;}
+.lock-error{font-size:13px;color:var(--red);min-height:18px;}
+
+/* ── MAIN APP ── */
+#app{display:none;max-width:640px;margin:0 auto;padding:32px 20px 60px;}
+
+.logo{font-family:'DM Serif Display',serif;font-size:18px;color:var(--gold);letter-spacing:.08em;margin-bottom:6px;}
+.page-title{font-family:'DM Serif Display',serif;font-size:28px;color:var(--cream);margin-bottom:6px;}
+.page-sub{font-size:13px;color:var(--text-muted);margin-bottom:36px;line-height:1.6;}
+
+/* ── FORM ── */
+.field{margin-bottom:20px;}
+.label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:block;}
+.input{
+  width:100%;padding:13px 14px;
+  background:var(--navy-mid);border:1.5px solid var(--navy-light);
+  border-radius:12px;color:var(--white);font-size:15px;font-weight:500;
+  outline:none;transition:border-color .15s;font-family:inherit;
+}
+.input:focus{border-color:var(--gold);}
+.input::placeholder{color:var(--text-muted);}
+
+/* ── DROP ZONE ── */
+.drop-zone{
+  border:2px dashed var(--navy-light);border-radius:16px;
+  padding:40px 24px;text-align:center;cursor:pointer;
+  transition:all .2s;background:var(--navy-mid);
+  position:relative;
+}
+.drop-zone.drag-over{border-color:var(--gold);background:rgba(201,168,76,.06);}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dz-icon{font-size:36px;margin-bottom:12px;}
+.dz-title{font-size:15px;font-weight:600;color:var(--cream);margin-bottom:4px;}
+.dz-sub{font-size:12px;color:var(--text-muted);}
+
+/* ── PHOTO PREVIEW GRID ── */
+.photo-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
+  gap:10px;margin-top:16px;
+}
+.photo-item{
+  position:relative;border-radius:10px;overflow:hidden;
+  aspect-ratio:4/3;background:var(--navy-light);
+}
+.photo-item img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-badge{
+  position:absolute;top:6px;left:6px;
+  background:rgba(15,30,46,.85);color:var(--gold);
+  font-size:10px;font-weight:700;padding:3px 7px;border-radius:8px;
+}
+.photo-remove{
+  position:absolute;top:6px;right:6px;
+  background:rgba(192,57,43,.9);color:white;
+  border:none;border-radius:50%;width:22px;height:22px;
+  font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  line-height:1;
+}
+.photo-order{
+  position:absolute;bottom:6px;left:6px;right:6px;
+  display:flex;gap:4px;justify-content:center;
+}
+.order-btn{
+  background:rgba(15,30,46,.85);color:var(--cream);
+  border:none;border-radius:6px;padding:3px 8px;font-size:11px;
+  cursor:pointer;font-family:inherit;
+}
+.order-btn:active{background:var(--gold);color:var(--navy);}
+
+/* ── ORDER HINT ── */
+.order-hint{
+  font-size:12px;color:var(--text-muted);margin-top:10px;line-height:1.6;
+  background:rgba(255,255,255,.04);border-radius:10px;padding:12px 14px;
+}
+.order-hint strong{color:var(--cream);}
+
+/* ── UPLOAD BTN ── */
+.upload-btn{
+  width:100%;padding:16px;margin-top:24px;
+  background:var(--gold);color:var(--navy);
+  border:none;border-radius:14px;font-size:16px;font-weight:700;
+  cursor:pointer;font-family:inherit;transition:opacity .15s;
+  letter-spacing:.01em;
+}
+.upload-btn:disabled{opacity:.35;cursor:default;}
+.upload-btn:not(:disabled):active{opacity:.85;}
+
+/* ── PROGRESS ── */
+.progress-wrap{margin-top:20px;display:none;}
+.progress-label{font-size:13px;color:var(--text-muted);margin-bottom:8px;}
+.progress-bar{height:4px;background:var(--navy-light);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .3s ease;width:0%;}
+
+/* ── RESULT ── */
+.result{
+  margin-top:24px;display:none;
+  background:var(--navy-mid);border:1px solid var(--navy-light);
+  border-radius:14px;padding:20px;
+}
+.result-title{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase;}
+.result-code{
+  background:rgba(0,0,0,.3);border-radius:10px;padding:14px;
+  font-family:'Courier New',monospace;font-size:11px;color:var(--cream);
+  white-space:pre-wrap;word-break:break-all;line-height:1.6;
+  max-height:200px;overflow-y:auto;
+}
+.copy-btn{
+  margin-top:12px;padding:10px 20px;
+  background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);
+  color:var(--gold);border-radius:10px;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:inherit;transition:all .15s;
+}
+.copy-btn:active{background:var(--gold);color:var(--navy);}
+.result-note{font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.6;}
+
+/* ── STATUS MESSAGES ── */
+.status{font-size:13px;margin-top:12px;min-height:20px;line-height:1.5;}
+.status.error{color:var(--red);}
+.status.success{color:#4CAF50;}
+.status.info{color:var(--text-muted);}
+
+/* ── DIVIDER ── */
+.divider{border:none;border-top:1px solid var(--navy-light);margin:28px 0;}
+  .section-head{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:30px 0 4px;padding-top:18px;border-top:1px solid var(--navy-light);}
+  .section-sub{font-size:11px;color:var(--text-muted);margin-bottom:14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr;}}
+  .req{color:var(--gold);}
+  textarea.input{min-height:64px;resize:vertical;font-family:inherit;}
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lock">
+  <div class="lock-logo">Prithjyo</div>
+  <div class="lock-title">Internal Tool — Photo Upload</div>
+  <input class="lock-input" type="password" id="lock-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')unlock()">
+  <button class="lock-btn" onclick="unlock()">Enter</button>
+  <div class="lock-error" id="lock-error"></div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="logo">Prithjyo</div>
+  <div class="page-title">Add a Listing</div>
+  <div class="page-sub">Fill in the details, drop the photos + video, and hit Add Listing. It writes the row and the media to the sheet in one go — live instantly, no deploy, no touching the sheet directly.</div>
+
+  <div class="section-head">Listing details</div>
+  <div class="section-sub">Fields marked <span class="req">*</span> are required.</div>
+
+  <div class="field">
+    <label class="label">Property Code <span class="req">*</span></label>
+    <input class="input" type="text" id="prop-code" placeholder="exactly as in the sheet — e.g. LPWPDMM - 2 BHK - 016">
+  </div>
+  <div class="field">
+    <label class="label">Location <span class="req">*</span></label>
+    <input class="input" type="text" id="f-loc" placeholder="e.g. Mahim W - near Metro">
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Configuration <span class="req">*</span></label>
+      <input class="input" type="text" id="f-config" placeholder="match the tab — e.g. 2 or 2 BHK">
+    </div>
+    <div class="field">
+      <label class="label">Carpet Area</label>
+      <input class="input" type="text" id="f-area" placeholder="e.g. 580">
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Furnishing</label>
+      <input class="input" type="text" id="f-furn" placeholder="e.g. Fully Furnished">
+    </div>
+    <div class="field">
+      <label class="label">Parking</label>
+      <input class="input" type="text" id="f-parking" placeholder="e.g. 1">
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Rent (&#8377;/month) <span class="req">*</span></label>
+      <input class="input" type="text" id="f-rent" placeholder="numbers only — e.g. 135000">
+    </div>
+    <div class="field">
+      <label class="label">Deposit</label>
+      <input class="input" type="text" id="f-deposit" placeholder="e.g. 3 Months">
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Pets</label>
+      <input class="input" type="text" id="f-pets" placeholder="e.g. Yes / No">
+    </div>
+    <div class="field">
+      <label class="label">Tenant Type</label>
+      <input class="input" type="text" id="f-tenant" placeholder="e.g. All Allowed">
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Possession</label>
+      <input class="input" type="text" id="f-possession" placeholder="e.g. Immediate">
+    </div>
+    <div class="field">
+      <label class="label">Building Name</label>
+      <input class="input" type="text" id="f-building" placeholder="e.g. Prescon Midtown Bay">
+    </div>
+  </div>
+  <div class="field">
+    <label class="label">Notes</label>
+    <textarea class="input" id="f-notes" placeholder="anything worth noting — e.g. sea facing, new building, all amenities"></textarea>
+  </div>
+  <div class="field">
+    <label class="label">Highlight</label>
+    <input class="input" type="text" id="f-highlight" placeholder="short tag shown on the card (optional)">
+  </div>
+
+  <div class="field">
+    <label class="label">Photos &amp; Video</label>
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept="image/*,video/*" multiple onchange="handleFiles(this.files)">
+      <div class="dz-icon">📷</div>
+      <div class="dz-title">Drop photos here or tap to select</div>
+      <div class="dz-sub">Photos + video · add photos in viewing order (cover first) · video is placed last</div>
+    </div>
+    <div class="photo-grid" id="photo-grid"></div>
+    <div class="order-hint" id="order-hint" style="display:none">
+      <strong>Photo order matters.</strong> Position 0 = cover (shown on card). Position 1 = hall/living. Position 2 = bedroom. Position 3 = kitchen. Position 4 = bathroom. Use the ← → buttons to reorder.
+    </div>
+    <div id="video-row" style="display:none"></div>
+  </div>
+
+  <div class="section-head">Internal — clients never see these</div>
+  <div class="section-sub">The relay strips these before anything reaches a client. Leave blank if not known.</div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Contact Person</label>
+      <input class="input" type="text" id="f-contact" placeholder="owner / broker name">
+    </div>
+    <div class="field">
+      <label class="label">Number</label>
+      <input class="input" type="text" id="f-number" placeholder="phone">
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Brokerage</label>
+      <input class="input" type="text" id="f-brokerage" placeholder="e.g. 1 month">
+    </div>
+    <div class="field">
+      <label class="label">Source / Agent</label>
+      <input class="input" type="text" id="f-source" placeholder="where it came from">
+    </div>
+  </div>
+  <div class="field">
+    <label class="label">Inspection Notice</label>
+    <input class="input" type="text" id="f-inspection" placeholder="e.g. 24 hours">
+  </div>
+
+  <button class="upload-btn" id="upload-btn" onclick="addListing()">Add Listing &#8594;</button>
+
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-label" id="progress-label">Uploading...</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <div class="result" id="result">
+    <div class="result-title" id="result-title">✓ Listing added</div>
+    <div class="result-note" id="result-note"></div>
+    <button class="copy-btn" onclick="resetForm()">Add another listing</button>
+  </div>
+</div>
+
+<script>
+// ── PASSWORD ──
+// Change this to whatever password you want
+const PASSWORD = 'prithjyo2026';
+const CLOUD = 'dayfllzwe';
+const PRESET = 'prithjyo_listings';
+const ADD_ENDPOINT = '/api/add-listing';
+function val(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+function unlock() {
+  const pw = document.getElementById('lock-pw').value;
+  if (pw === PASSWORD) {
+    document.getElementById('lock').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  } else {
+    document.getElementById('lock-error').textContent = 'Incorrect password.';
+    document.getElementById('lock-pw').value = '';
+    document.getElementById('lock-pw').focus();
+  }
+}
+
+// ── PHOTO MANAGEMENT ──
+let photos = []; // array of File objects in order
+let videoFile = null; // single video, uploaded last
+
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+
+function handleFiles(files) {
+  const arr = Array.from(files);
+  const imgs = arr.filter(f => f.type.startsWith('image/'));
+  const vids = arr.filter(f => f.type.startsWith('video/'));
+  photos = [...photos, ...imgs];
+  if (vids.length) videoFile = vids[vids.length - 1]; // last video wins if several dropped
+  renderGrid();
+  renderVideo();
+  updateUploadBtn();
+}
+
+function renderVideo() {
+  const row = document.getElementById('video-row');
+  if (!videoFile) { row.style.display = 'none'; row.innerHTML = ''; return; }
+  row.style.display = 'block';
+  row.innerHTML = '';
+  const tag = document.createElement('div');
+  tag.className = 'video-tag';
+  tag.appendChild(document.createTextNode('🎬  ' + videoFile.name));
+  const rm = document.createElement('button');
+  rm.className = 'video-remove';
+  rm.textContent = 'remove';
+  rm.onclick = () => { videoFile = null; renderVideo(); updateUploadBtn(); };
+  tag.appendChild(rm);
+  row.appendChild(tag);
+}
+
+function removePhoto(idx) {
+  photos.splice(idx, 1);
+  renderGrid();
+  updateUploadBtn();
+}
+
+function movePhoto(idx, dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= photos.length) return;
+  [photos[idx], photos[newIdx]] = [photos[newIdx], photos[idx]];
+  renderGrid();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('photo-grid');
+  const hint = document.getElementById('order-hint');
+  grid.innerHTML = '';
+  if (photos.length === 0) { hint.style.display = 'none'; return; }
+  hint.style.display = 'block';
+
+  photos.forEach((file, i) => {
+    const item = document.createElement('div');
+    item.className = 'photo-item';
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    const badge = document.createElement('div');
+    badge.className = 'photo-badge';
+    badge.textContent = i === 0 ? 'Cover' : '#' + i;
+    const rem = document.createElement('button');
+    rem.className = 'photo-remove';
+    rem.innerHTML = '×';
+    rem.onclick = () => removePhoto(i);
+    const orderDiv = document.createElement('div');
+    orderDiv.className = 'photo-order';
+    if (i > 0) {
+      const left = document.createElement('button');
+      left.className = 'order-btn'; left.textContent = '←';
+      left.onclick = () => movePhoto(i, -1);
+      orderDiv.appendChild(left);
+    }
+    if (i < photos.length - 1) {
+      const right = document.createElement('button');
+      right.className = 'order-btn'; right.textContent = '→';
+      right.onclick = () => movePhoto(i, 1);
+      orderDiv.appendChild(right);
+    }
+    item.appendChild(img);
+    item.appendChild(badge);
+    item.appendChild(rem);
+    item.appendChild(orderDiv);
+    grid.appendChild(item);
+  });
+}
+
+function updateUploadBtn() { /* button is always enabled now; addListing() validates on submit */ }
+document.getElementById('prop-code').addEventListener('input', updateUploadBtn);
+
+// ── UPLOAD (direct to Cloudinary, no backend) ──
+function slugCode(code){ return code.trim().replace(/[\/\\]/g,'-').replace(/\s+/g,'-'); }
+
+// Convert the typed code to the deck's short MEDIA_DB key (mirrors resolveMediaKey in index.html)
+function toMediaKey(raw) {
+  raw = raw.trim();
+  let m;
+  // LPWPDMM - n[.m] BHK - idx  ->  LP-<digits>BHK-<idx padded to 3>
+  m = raw.match(/LPWPDMM\s*-\s*([0-9.]+)\s*(?:BHK|bhk)?\s*-?\s*([0-9]+)/i);
+  if (m) return 'LP-' + m[1].replace('.', '') + 'BHK-' + m[2].padStart(3, '0');
+  // SoBo - n[.m] BHK - idx  ->  SOBO-<digits>BHK-<idx padded to 3>
+  m = raw.match(/[Ss][Oo][Bb][Oo]\s*-\s*([0-9.]+)\s*(?:BHK|bhk)?\s*-\s*([0-9]+)/i);
+  if (m) return 'SOBO-' + m[1].replace('.', '') + 'BHK-' + m[2].padStart(3, '0');
+  // BKSJ - rest  ->  BKSJ-rest (spaces removed)
+  m = raw.match(/BKSJ\s*-\s*(.+)/i);
+  if (m) return 'BKSJ-' + m[1].trim().replace(/\s*-\s*/g, '-').replace(/\s+/g, '');
+  // Default (BKJS-, LP-, SOBO-, or already-short codes): collapse dashes, drop spaces
+  return raw.replace(/\s*-\s*/g, '-').replace(/\s+/g, '');
+}
+
+async function cloudinaryUpload(file, folder, isVideo){
+  const url = 'https://api.cloudinary.com/v1_1/' + CLOUD + '/' + (isVideo ? 'video' : 'image') + '/upload';
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', PRESET);
+  fd.append('folder', folder);
+  const res = await fetch(url, { method: 'POST', body: fd });
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error((data.error && data.error.message) || ('HTTP ' + res.status));
+  return data.secure_url;
+}
+
+async function addListing() {
+  const code   = val('prop-code');
+  const loc    = val('f-loc');
+  const config = val('f-config');
+  const rent   = val('f-rent');
+
+  // required-field check (the write endpoint enforces these too)
+  const missing = [];
+  if (!code)   missing.push('Property Code');
+  if (!loc)    missing.push('Location');
+  if (!config) missing.push('Configuration');
+  if (!rent)   missing.push('Rent');
+  if (missing.length) { setStatus('error', 'Please fill: ' + missing.join(', ') + '.'); return; }
+  if (!/^\d[\d, ]*$/.test(rent)) { setStatus('error', 'Rent must be a number (got "' + rent + '").'); return; }
+
+  const btn = document.getElementById('upload-btn');
+  const progressWrap = document.getElementById('progress-wrap');
+  const progressFill = document.getElementById('progress-fill');
+  const progressLabel = document.getElementById('progress-label');
+  document.getElementById('result').style.display = 'none';
+  btn.disabled = true;
+  progressWrap.style.display = 'block';
+  setStatus('info', '');
+
+  // 1) Upload media to Cloudinary (optional — a listing can be added photoless)
+  let mediaValue = '';
+  try {
+    const folder = 'prithjyo/' + toMediaKey(code);
+    const total = photos.length + (videoFile ? 1 : 0);
+    const urls = [];
+    let done = 0;
+    for (let i = 0; i < photos.length; i++) {
+      progressLabel.textContent = `Uploading photo ${i + 1} of ${photos.length}...`;
+      progressFill.style.width = (total ? (done / total) * 100 : 0) + '%';
+      urls.push(await cloudinaryUpload(photos[i], folder, false));
+      done++;
+    }
+    if (videoFile) {
+      progressLabel.textContent = 'Uploading video (this one can take a bit)...';
+      progressFill.style.width = (total ? (done / total) * 100 : 0) + '%';
+      urls.push(await cloudinaryUpload(videoFile, folder, true));
+      done++;
+    }
+    mediaValue = urls.join('|');
+  } catch (err) {
+    setStatus('error', 'Photo upload failed: ' + err.message + ' — nothing was written to the sheet.');
+    btn.disabled = false; progressWrap.style.display = 'none';
+    return;
+  }
+
+  // 2) Write the row to the sheet through the relay
+  progressFill.style.width = '100%';
+  progressLabel.textContent = 'Saving listing to the sheet...';
+
+  const payload = {
+    password: PASSWORD,
+    code: code, loc: loc, config: config, area: val('f-area'),
+    furn: val('f-furn'), parking: val('f-parking'), rent: rent, deposit: val('f-deposit'),
+    pets: val('f-pets'), tenantType: val('f-tenant'), possession: val('f-possession'),
+    notes: val('f-notes'), building: val('f-building'), highlight: val('f-highlight'),
+    contact: val('f-contact'), number: val('f-number'), brokerage: val('f-brokerage'),
+    inspection: val('f-inspection'), source: val('f-source'),
+    media: mediaValue
+  };
+
+  try {
+    const res = await fetch(ADD_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!data || !data.success) {
+      const why = (data && data.error) || ('server returned ' + res.status);
+      setStatus('error', 'Not added: ' + why + (mediaValue ? '  (photos uploaded to Cloudinary, but no row was written — fix and resubmit.)' : ''));
+      btn.disabled = false; progressWrap.style.display = 'none';
+      return;
+    }
+    progressWrap.style.display = 'none';
+    setStatus('success', '');
+    document.getElementById('result-title').textContent = '✓ Listing added';
+    document.getElementById('result-note').textContent =
+      `"${data.code}" added to ${data.tab} (row ${data.rowNumber})${mediaValue ? ' with its photos' : ' — no photos yet'}. It's live — refresh the deck to see it.`;
+    document.getElementById('result').style.display = 'block';
+    btn.disabled = false;
+  } catch (err) {
+    setStatus('error', 'Could not reach the sheet: ' + err.message + (mediaValue ? '  (photos uploaded, but no row was written.)' : ''));
+    btn.disabled = false; progressWrap.style.display = 'none';
+  }
+}
+
+function setStatus(kind, msg) {
+  const el = document.getElementById('status');
+  el.className = 'status ' + kind;
+  el.textContent = msg;
+}
+
+function resetForm() {
+  ['prop-code','f-loc','f-config','f-area','f-furn','f-parking','f-rent','f-deposit','f-pets','f-tenant','f-possession','f-building','f-notes','f-highlight','f-contact','f-number','f-brokerage','f-inspection','f-source']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  photos = []; videoFile = null;
+  document.getElementById('file-input').value = '';
+  renderGrid(); renderVideo();
+  document.getElementById('result').style.display = 'none';
+  setStatus('info', '');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
