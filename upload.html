@@ -349,6 +349,23 @@ document.getElementById('prop-code').addEventListener('input', updateUploadBtn);
 // ── UPLOAD (direct to Cloudinary, no backend) ──
 function slugCode(code){ return code.trim().replace(/[\/\\]/g,'-').replace(/\s+/g,'-'); }
 
+// Convert the typed code to the deck's short MEDIA_DB key (mirrors resolveMediaKey in index.html)
+function toMediaKey(raw) {
+  raw = raw.trim();
+  let m;
+  // LPWPDMM - n[.m] BHK - idx  ->  LP-<digits>BHK-<idx padded to 3>
+  m = raw.match(/LPWPDMM\s*-\s*([0-9.]+)\s*(?:BHK|bhk)?\s*-?\s*([0-9]+)/i);
+  if (m) return 'LP-' + m[1].replace('.', '') + 'BHK-' + m[2].padStart(3, '0');
+  // SoBo - n[.m] BHK - idx  ->  SOBO-<digits>BHK-<idx padded to 3>
+  m = raw.match(/[Ss][Oo][Bb][Oo]\s*-\s*([0-9.]+)\s*(?:BHK|bhk)?\s*-\s*([0-9]+)/i);
+  if (m) return 'SOBO-' + m[1].replace('.', '') + 'BHK-' + m[2].padStart(3, '0');
+  // BKSJ - rest  ->  BKSJ-rest (spaces removed)
+  m = raw.match(/BKSJ\s*-\s*(.+)/i);
+  if (m) return 'BKSJ-' + m[1].trim().replace(/\s*-\s*/g, '-').replace(/\s+/g, '');
+  // Default (BKJS-, LP-, SOBO-, or already-short codes): collapse dashes, drop spaces
+  return raw.replace(/\s*-\s*/g, '-').replace(/\s+/g, '');
+}
+
 async function cloudinaryUpload(file, folder, isVideo){
   const url = 'https://api.cloudinary.com/v1_1/' + CLOUD + '/' + (isVideo ? 'video' : 'image') + '/upload';
   const fd = new FormData();
@@ -379,7 +396,8 @@ async function uploadAll() {
   statusEl.className = 'status info';
   statusEl.textContent = '';
 
-  const folder = 'prithjyo/' + slugCode(code);
+  const mediaKey = toMediaKey(code);
+  const folder = 'prithjyo/' + mediaKey;
   const total = photos.length + (videoFile ? 1 : 0);
   const gallery = [];
   let done = 0;
@@ -410,10 +428,12 @@ async function uploadAll() {
   progressFill.style.width = '100%';
   progressLabel.textContent = 'All uploads complete ✓';
 
-  // Build the MEDIA_DB entry (cover:null — gallery[0] is the card face)
+  // Build the MEDIA_DB entry — short key + cover = first photo (the card face)
+  const coverUrl = (gallery.find(g => g.type === 'image') || {}).url || null;
+  const coverLine = coverUrl ? `cover:'${coverUrl}'` : 'cover:null';
   const galleryItems = gallery.map(g => `{type:'${g.type}',url:'${g.url}'}`).join(',\n    ');
-  const snippet = `  '${code}':{
-    cover:null,
+  const snippet = `  '${mediaKey}':{
+    ${coverLine},
     gallery:[
     ${galleryItems}
   ]},`;
