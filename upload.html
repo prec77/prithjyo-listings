@@ -170,6 +170,12 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
 
 /* ── DIVIDER ── */
 .divider{border:none;border-top:1px solid var(--navy-light);margin:28px 0;}
+  .section-head{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:30px 0 4px;padding-top:18px;border-top:1px solid var(--navy-light);}
+  .section-sub{font-size:11px;color:var(--text-muted);margin-bottom:14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr;}}
+  .req{color:var(--gold);}
+  textarea.input{min-height:64px;resize:vertical;font-family:inherit;}
 </style>
 </head>
 <body>
@@ -186,12 +192,77 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
 <!-- MAIN APP -->
 <div id="app">
   <div class="logo">Prithjyo</div>
-  <div class="page-title">Photo Upload</div>
-  <div class="page-sub">Upload a listing's photos + video. They go to Cloudinary and come back as one value to paste into the sheet's Media column — live instantly, no deploy.</div>
+  <div class="page-title">Add a Listing</div>
+  <div class="page-sub">Fill in the details, drop the photos + video, and hit Add Listing. It writes the row and the media to the sheet in one go — live instantly, no deploy, no touching the sheet directly.</div>
+
+  <div class="section-head">Listing details</div>
+  <div class="section-sub">Fields marked <span class="req">*</span> are required.</div>
 
   <div class="field">
-    <label class="label">Property Code</label>
-    <input class="input" type="text" id="prop-code" placeholder="e.g. BKJS-1B-022" oninput="this.value=this.value.toUpperCase()">
+    <label class="label">Property Code <span class="req">*</span></label>
+    <input class="input" type="text" id="prop-code" placeholder="exactly as in the sheet — e.g. LPWPDMM - 2 BHK - 016">
+  </div>
+  <div class="field">
+    <label class="label">Location <span class="req">*</span></label>
+    <input class="input" type="text" id="f-loc" placeholder="e.g. Mahim W - near Metro">
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Configuration <span class="req">*</span></label>
+      <input class="input" type="text" id="f-config" placeholder="match the tab — e.g. 2 or 2 BHK">
+    </div>
+    <div class="field">
+      <label class="label">Carpet Area</label>
+      <input class="input" type="text" id="f-area" placeholder="e.g. 580">
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Furnishing</label>
+      <input class="input" type="text" id="f-furn" placeholder="e.g. Fully Furnished">
+    </div>
+    <div class="field">
+      <label class="label">Parking</label>
+      <input class="input" type="text" id="f-parking" placeholder="e.g. 1">
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Rent (&#8377;/month) <span class="req">*</span></label>
+      <input class="input" type="text" id="f-rent" placeholder="numbers only — e.g. 135000">
+    </div>
+    <div class="field">
+      <label class="label">Deposit</label>
+      <input class="input" type="text" id="f-deposit" placeholder="e.g. 3 Months">
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Pets</label>
+      <input class="input" type="text" id="f-pets" placeholder="e.g. Yes / No">
+    </div>
+    <div class="field">
+      <label class="label">Tenant Type</label>
+      <input class="input" type="text" id="f-tenant" placeholder="e.g. All Allowed">
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Possession</label>
+      <input class="input" type="text" id="f-possession" placeholder="e.g. Immediate">
+    </div>
+    <div class="field">
+      <label class="label">Building Name</label>
+      <input class="input" type="text" id="f-building" placeholder="e.g. Prescon Midtown Bay">
+    </div>
+  </div>
+  <div class="field">
+    <label class="label">Notes</label>
+    <textarea class="input" id="f-notes" placeholder="anything worth noting — e.g. sea facing, new building, all amenities"></textarea>
+  </div>
+  <div class="field">
+    <label class="label">Highlight</label>
+    <input class="input" type="text" id="f-highlight" placeholder="short tag shown on the card (optional)">
   </div>
 
   <div class="field">
@@ -209,7 +280,34 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
     <div id="video-row" style="display:none"></div>
   </div>
 
-  <button class="upload-btn" id="upload-btn" onclick="uploadAll()" disabled>Upload to Cloudinary →</button>
+  <div class="section-head">Internal — clients never see these</div>
+  <div class="section-sub">The relay strips these before anything reaches a client. Leave blank if not known.</div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Contact Person</label>
+      <input class="input" type="text" id="f-contact" placeholder="owner / broker name">
+    </div>
+    <div class="field">
+      <label class="label">Number</label>
+      <input class="input" type="text" id="f-number" placeholder="phone">
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label class="label">Brokerage</label>
+      <input class="input" type="text" id="f-brokerage" placeholder="e.g. 1 month">
+    </div>
+    <div class="field">
+      <label class="label">Source / Agent</label>
+      <input class="input" type="text" id="f-source" placeholder="where it came from">
+    </div>
+  </div>
+  <div class="field">
+    <label class="label">Inspection Notice</label>
+    <input class="input" type="text" id="f-inspection" placeholder="e.g. 24 hours">
+  </div>
+
+  <button class="upload-btn" id="upload-btn" onclick="addListing()">Add Listing &#8594;</button>
 
   <div class="progress-wrap" id="progress-wrap">
     <div class="progress-label" id="progress-label">Uploading...</div>
@@ -219,10 +317,9 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
   <div class="status" id="status"></div>
 
   <div class="result" id="result">
-    <div class="result-title">✓ Media value — paste into the sheet</div>
-    <div class="result-code" id="result-code"></div>
-    <button class="copy-btn" onclick="copyResult()">Copy value</button>
-    <div class="result-note">Paste this into column <strong>V (Media)</strong> of this listing's row in the master sheet. The deck reads it live — no GitHub, no deploy.</div>
+    <div class="result-title" id="result-title">✓ Listing added</div>
+    <div class="result-note" id="result-note"></div>
+    <button class="copy-btn" onclick="resetForm()">Add another listing</button>
   </div>
 </div>
 
@@ -232,6 +329,8 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
 const PASSWORD = 'prithjyo2026';
 const CLOUD = 'dayfllzwe';
 const PRESET = 'prithjyo_listings';
+const ADD_ENDPOINT = '/api/add-listing';
+function val(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; }
 
 function unlock() {
   const pw = document.getElementById('lock-pw').value;
@@ -339,11 +438,7 @@ function renderGrid() {
   });
 }
 
-function updateUploadBtn() {
-  const code = document.getElementById('prop-code').value.trim();
-  const btn = document.getElementById('upload-btn');
-  btn.disabled = !(code && (photos.length > 0 || videoFile));
-}
+function updateUploadBtn() { /* button is always enabled now; addListing() validates on submit */ }
 document.getElementById('prop-code').addEventListener('input', updateUploadBtn);
 
 // ── UPLOAD (direct to Cloudinary, no backend) ──
@@ -378,74 +473,112 @@ async function cloudinaryUpload(file, folder, isVideo){
   return data.secure_url;
 }
 
-async function uploadAll() {
-  const code = document.getElementById('prop-code').value.trim();
-  if (!code || (photos.length === 0 && !videoFile)) return;
+async function addListing() {
+  const code   = val('prop-code');
+  const loc    = val('f-loc');
+  const config = val('f-config');
+  const rent   = val('f-rent');
+
+  // required-field check (the write endpoint enforces these too)
+  const missing = [];
+  if (!code)   missing.push('Property Code');
+  if (!loc)    missing.push('Location');
+  if (!config) missing.push('Configuration');
+  if (!rent)   missing.push('Rent');
+  if (missing.length) { setStatus('error', 'Please fill: ' + missing.join(', ') + '.'); return; }
+  if (!/^\d[\d, ]*$/.test(rent)) { setStatus('error', 'Rent must be a number (got "' + rent + '").'); return; }
 
   const btn = document.getElementById('upload-btn');
   const progressWrap = document.getElementById('progress-wrap');
   const progressFill = document.getElementById('progress-fill');
   const progressLabel = document.getElementById('progress-label');
-  const statusEl = document.getElementById('status');
-  const resultEl = document.getElementById('result');
-  const resultCode = document.getElementById('result-code');
-
+  document.getElementById('result').style.display = 'none';
   btn.disabled = true;
   progressWrap.style.display = 'block';
-  resultEl.style.display = 'none';
-  statusEl.className = 'status info';
-  statusEl.textContent = '';
+  setStatus('info', '');
 
-  const mediaKey = toMediaKey(code);
-  const folder = 'prithjyo/' + mediaKey;
-  const total = photos.length + (videoFile ? 1 : 0);
-  const gallery = [];
-  let done = 0;
-
+  // 1) Upload media to Cloudinary (optional — a listing can be added photoless)
+  let mediaValue = '';
   try {
+    const folder = 'prithjyo/' + toMediaKey(code);
+    const total = photos.length + (videoFile ? 1 : 0);
+    const urls = [];
+    let done = 0;
     for (let i = 0; i < photos.length; i++) {
       progressLabel.textContent = `Uploading photo ${i + 1} of ${photos.length}...`;
-      progressFill.style.width = ((done / total) * 100) + '%';
-      const u = await cloudinaryUpload(photos[i], folder, false);
-      gallery.push({ type: 'image', url: u });
+      progressFill.style.width = (total ? (done / total) * 100 : 0) + '%';
+      urls.push(await cloudinaryUpload(photos[i], folder, false));
       done++;
     }
     if (videoFile) {
       progressLabel.textContent = 'Uploading video (this one can take a bit)...';
-      progressFill.style.width = ((done / total) * 100) + '%';
-      const vu = await cloudinaryUpload(videoFile, folder, true);
-      gallery.push({ type: 'video', url: vu });
+      progressFill.style.width = (total ? (done / total) * 100 : 0) + '%';
+      urls.push(await cloudinaryUpload(videoFile, folder, true));
       done++;
     }
+    mediaValue = urls.join('|');
   } catch (err) {
-    statusEl.className = 'status error';
-    statusEl.textContent = `Upload failed: ${err.message}`;
-    btn.disabled = false;
-    progressWrap.style.display = 'none';
+    setStatus('error', 'Photo upload failed: ' + err.message + ' — nothing was written to the sheet.');
+    btn.disabled = false; progressWrap.style.display = 'none';
     return;
   }
 
+  // 2) Write the row to the sheet through the relay
   progressFill.style.width = '100%';
-  progressLabel.textContent = 'All uploads complete ✓';
+  progressLabel.textContent = 'Saving listing to the sheet...';
 
-  // Build the column-V (Media) value — pipe-separated URLs, cover (first photo) first, video last
-  const mediaValue = gallery.map(g => g.url).join('|');
+  const payload = {
+    password: PASSWORD,
+    code: code, loc: loc, config: config, area: val('f-area'),
+    furn: val('f-furn'), parking: val('f-parking'), rent: rent, deposit: val('f-deposit'),
+    pets: val('f-pets'), tenantType: val('f-tenant'), possession: val('f-possession'),
+    notes: val('f-notes'), building: val('f-building'), highlight: val('f-highlight'),
+    contact: val('f-contact'), number: val('f-number'), brokerage: val('f-brokerage'),
+    inspection: val('f-inspection'), source: val('f-source'),
+    media: mediaValue
+  };
 
-  resultCode.textContent = mediaValue;
-  resultEl.style.display = 'block';
-  statusEl.className = 'status success';
-  statusEl.textContent = `${total} item(s) uploaded. Paste the value into column V (Media) of row "${code}".`;
-
-  setTimeout(() => { progressWrap.style.display = 'none'; }, 1500);
+  try {
+    const res = await fetch(ADD_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!data || !data.success) {
+      const why = (data && data.error) || ('server returned ' + res.status);
+      setStatus('error', 'Not added: ' + why + (mediaValue ? '  (photos uploaded to Cloudinary, but no row was written — fix and resubmit.)' : ''));
+      btn.disabled = false; progressWrap.style.display = 'none';
+      return;
+    }
+    progressWrap.style.display = 'none';
+    setStatus('success', '');
+    document.getElementById('result-title').textContent = '✓ Listing added';
+    document.getElementById('result-note').textContent =
+      `"${data.code}" added to ${data.tab} (row ${data.rowNumber})${mediaValue ? ' with its photos' : ' — no photos yet'}. It's live — refresh the deck to see it.`;
+    document.getElementById('result').style.display = 'block';
+    btn.disabled = false;
+  } catch (err) {
+    setStatus('error', 'Could not reach the sheet: ' + err.message + (mediaValue ? '  (photos uploaded, but no row was written.)' : ''));
+    btn.disabled = false; progressWrap.style.display = 'none';
+  }
 }
 
-function copyResult() {
-  const text = document.getElementById('result-code').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.copy-btn');
-    btn.textContent = 'Copied ✓';
-    setTimeout(() => btn.textContent = 'Copy value', 2000);
-  });
+function setStatus(kind, msg) {
+  const el = document.getElementById('status');
+  el.className = 'status ' + kind;
+  el.textContent = msg;
+}
+
+function resetForm() {
+  ['prop-code','f-loc','f-config','f-area','f-furn','f-parking','f-rent','f-deposit','f-pets','f-tenant','f-possession','f-building','f-notes','f-highlight','f-contact','f-number','f-brokerage','f-inspection','f-source']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  photos = []; videoFile = null;
+  document.getElementById('file-input').value = '';
+  renderGrid(); renderVideo();
+  document.getElementById('result').style.display = 'none';
+  setStatus('info', '');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
 </body>
