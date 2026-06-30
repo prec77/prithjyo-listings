@@ -187,7 +187,7 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
 <div id="app">
   <div class="logo">Prithjyo</div>
   <div class="page-title">Photo Upload</div>
-  <div class="page-sub">Upload photos for a listing. They go to Cloudinary and come back as URLs ready to inject into the swipe deck.</div>
+  <div class="page-sub">Upload a listing's photos + video. They go to Cloudinary and come back as one value to paste into the sheet's Media column — live instantly, no deploy.</div>
 
   <div class="field">
     <label class="label">Property Code</label>
@@ -219,10 +219,10 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
   <div class="status" id="status"></div>
 
   <div class="result" id="result">
-    <div class="result-title">✓ Ready to inject</div>
+    <div class="result-title">✓ Media value — paste into the sheet</div>
     <div class="result-code" id="result-code"></div>
-    <button class="copy-btn" onclick="copyResult()">Copy code</button>
-    <div class="result-note">Paste this code to Claude and say: "Inject this into the swipe deck HTML." One GitHub upload and photos are live.</div>
+    <button class="copy-btn" onclick="copyResult()">Copy value</button>
+    <div class="result-note">Paste this into column <strong>V (Media)</strong> of this listing's row in the master sheet. The deck reads it live — no GitHub, no deploy.</div>
   </div>
 </div>
 
@@ -428,20 +428,13 @@ async function uploadAll() {
   progressFill.style.width = '100%';
   progressLabel.textContent = 'All uploads complete ✓';
 
-  // Build the MEDIA_DB entry — short key + cover = first photo (the card face)
-  const coverUrl = (gallery.find(g => g.type === 'image') || {}).url || null;
-  const coverLine = coverUrl ? `cover:'${coverUrl}'` : 'cover:null';
-  const galleryItems = gallery.map(g => `{type:'${g.type}',url:'${g.url}'}`).join(',\n    ');
-  const snippet = `  '${mediaKey}':{
-    ${coverLine},
-    gallery:[
-    ${galleryItems}
-  ]},`;
+  // Build the column-V (Media) value — pipe-separated URLs, cover (first photo) first, video last
+  const mediaValue = gallery.map(g => g.url).join('|');
 
-  resultCode.textContent = snippet;
+  resultCode.textContent = mediaValue;
   resultEl.style.display = 'block';
   statusEl.className = 'status success';
-  statusEl.textContent = `${total} item(s) uploaded successfully.`;
+  statusEl.textContent = `${total} item(s) uploaded. Paste the value into column V (Media) of row "${code}".`;
 
   setTimeout(() => { progressWrap.style.display = 'none'; }, 1500);
 }
@@ -451,7 +444,7 @@ function copyResult() {
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.querySelector('.copy-btn');
     btn.textContent = 'Copied ✓';
-    setTimeout(() => btn.textContent = 'Copy code', 2000);
+    setTimeout(() => btn.textContent = 'Copy value', 2000);
   });
 }
 </script>
