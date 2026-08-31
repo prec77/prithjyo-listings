@@ -492,7 +492,7 @@ button{background:none;border:none;cursor:pointer;}
 .act svg{stroke-width:1.9;}
 .act-pass{color:var(--ink);}
 .act-keep{color:var(--clay);border-color:var(--clay);background:var(--clay-wash);}
-.act-undo{width:44px;height:44px;color:var(--muted);background:transparent;border-color:transparent;}
+.act-undo{width:48px;height:48px;color:var(--muted);background:transparent;border-color:transparent;}
 .act-undo svg{width:17px;height:17px;}
 .act-undo[disabled]{opacity:.28;pointer-events:none;}
 
@@ -522,7 +522,7 @@ button{background:none;border:none;cursor:pointer;}
   .plate-count{font-size:9px;letter-spacing:.12em;}
   .dock{gap:8px;padding-left:14px;padding-right:14px;}
   .act{width:48px;height:48px;}
-  .act-undo{width:40px;height:40px;}
+  .act-undo{width:48px;height:48px;}
   .kept-btn{height:48px;font-size:10.5px;letter-spacing:.07em;padding:0 8px;}
 }
 .kept-btn:active{transform:scale(.97);opacity:.9;}
@@ -593,7 +593,8 @@ button{background:none;border:none;cursor:pointer;}
 
 .pc-btns{display:flex;flex-direction:column;gap:var(--sp-2);}
 .pc-btn{
-  width:100%;padding:14px;border-radius:var(--r-md);
+  width:100%;min-height:48px;padding:14px;border-radius:var(--r-md);
+  display:flex;align-items:center;justify-content:center;
   font-family:var(--f-display);font-variation-settings:var(--wide);
   font-weight:700;font-size:12px;text-transform:uppercase;
   letter-spacing:.1em;text-align:center;
@@ -610,53 +611,80 @@ button{background:none;border:none;cursor:pointer;}
   background:var(--sand);
 }
 .shortlist.active{display:flex;}
+/* The header used to wrap to two lines of display type and cost 91px —
+   on a 320px phone that left three rows above the fold. Title and count
+   now sit on one line at a scale that cannot wrap, the back control is
+   short enough not to collide with it, and the summary occupies the
+   second line that the wrap was wasting anyway. */
 .sl-head{
-  display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);
-  padding:calc(var(--safe-top) + 14px) var(--gutter) 13px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:var(--sp-3);
+  padding:calc(var(--safe-top) + 11px) var(--gutter) 10px;
   border-bottom:1px solid var(--line);flex-shrink:0;background:var(--sand);
 }
+.sl-head-text{min-width:0;flex:1;}
 .sl-title{
   font-family:var(--f-display);font-variation-settings:var(--wide);
-  font-weight:800;font-size:var(--t-d3);text-transform:uppercase;
-  letter-spacing:-.01em;color:var(--ink);
+  font-weight:800;font-size:17px;text-transform:uppercase;
+  letter-spacing:-.008em;color:var(--ink);line-height:1.1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .sl-title em{font-style:normal;color:var(--muted);margin-left:7px;font-variant-numeric:tabular-nums;}
+/* Item 9 — the shape of the shortlist, from data already loaded. */
+.sl-summary{
+  font-size:11.5px;color:var(--muted);margin-top:3px;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.sl-summary:empty{display:none;}
 .sl-back{
-  display:inline-flex;align-items:center;gap:5px;
+  display:inline-flex;align-items:center;gap:5px;flex-shrink:0;
+  min-height:48px;padding:0 2px;
   font-family:var(--f-display);font-variation-settings:var(--wide);
   font-weight:600;font-size:var(--t-label);text-transform:uppercase;
-  letter-spacing:var(--track-label);color:var(--muted);
-  padding:6px 2px;transition:color var(--dur-1) var(--ease);
+  letter-spacing:var(--track-label);color:var(--muted);white-space:nowrap;
+  transition:color var(--dur-1) var(--ease);
 }
 .sl-back:active{color:var(--ink);}
 .sl-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:var(--sp-2) var(--gutter) var(--sp-4);}
 
 .sl-group{
-  padding:var(--sp-5) 0 var(--sp-2);
+  padding:var(--sp-4) 0 6px;
   font-family:var(--f-display);font-variation-settings:var(--wide);
   font-weight:600;font-size:var(--t-label);text-transform:uppercase;
   letter-spacing:var(--track-label);color:var(--muted);
 }
 .sl-row{
   display:flex;gap:var(--sp-3);align-items:center;
-  padding:var(--sp-3) 0;border-bottom:1px solid var(--line);
+  padding:11px 0;border-bottom:1px solid var(--line);
 }
 .sl-thumb{
   width:64px;height:64px;border-radius:var(--r-sm);flex-shrink:0;
   background:var(--sand-deep);overflow:hidden;
   display:flex;align-items:center;justify-content:center;color:var(--muted);
 }
-.sl-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+/* Item 7 — identical crop logic to the deck hero (.card-media img), so
+   the same flat reads as the same flat across both screens. */
+.sl-thumb img{
+  width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  display:block;flex-shrink:0;
+}
 .sl-info{flex:1;min-width:0;}
 .sl-name{
   font-family:var(--f-display);font-variation-settings:var(--wide);
-  font-weight:700;font-size:13.5px;text-transform:uppercase;
+  font-weight:700;font-size:13px;text-transform:uppercase;
   letter-spacing:-.005em;color:var(--ink);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;
 }
+/* Item 10 — same family, weight and tabular figures as the deck plate,
+   set one step down. On the deck the rent is the hero because you are
+   deciding; here you have already decided and are comparing, so it stays
+   the scannable anchor of the row without shouting. Tabular figures keep
+   the column aligned down the list. */
 .sl-rent{
   font-family:var(--f-display);font-variation-settings:var(--wide);
-  font-weight:700;font-size:15px;color:var(--ink);
+  font-weight:800;font-size:17px;color:var(--ink);
+  letter-spacing:-.01em;
   font-variant-numeric:tabular-nums;margin-bottom:3px;
 }
 .sl-rent i{font-style:normal;font-family:var(--f-body);font-weight:400;font-size:11px;color:var(--muted);}
@@ -671,9 +699,11 @@ button{background:none;border:none;cursor:pointer;}
 
 /* "View?" is a checkbox in disguise: it must read as chosen or not at
    a glance, because it decides what goes into the WhatsApp message. */
+/* Item 3 — this is how a flat gets marked for viewing, so it holds a
+   full 48px target at every width and never shrinks into the edge. */
 .sl-pick{
-  flex-shrink:0;display:inline-flex;align-items:center;gap:6px;
-  padding:8px 12px;border-radius:var(--r-full);
+  flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:48px;padding:0 13px;border-radius:var(--r-full);
   border:1px solid var(--line);background:var(--paper);
   font-family:var(--f-display);font-variation-settings:var(--wide);
   font-weight:600;font-size:var(--t-label);text-transform:uppercase;
@@ -860,7 +890,8 @@ button{background:none;border:none;cursor:pointer;}
 .req-cta:active:not(:disabled){transform:scale(.985);opacity:.92;}
 .req-cta:disabled{background:var(--sand-deep);color:var(--muted);cursor:default;}
 .req-back{
-  display:block;width:100%;text-align:center;margin-top:10px;padding:6px;
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:48px;text-align:center;margin-top:4px;padding:6px;
   font-size:var(--t-cap);color:var(--muted);
   text-decoration:underline;text-underline-offset:3px;
   text-decoration-color:var(--line);
@@ -988,7 +1019,7 @@ button{background:none;border:none;cursor:pointer;}
 .fs-head .wordmark{margin-bottom:var(--sp-8);}
 .fs-title{
   font-family:var(--f-display);font-variation-settings:var(--wide);
-  font-weight:800;font-size:var(--t-d1);line-height:.96;
+  font-weight:800;font-size:clamp(28px,11vw,var(--t-d1));line-height:.96;
   text-transform:uppercase;letter-spacing:-.028em;color:var(--ink);
   margin-bottom:var(--sp-3);text-wrap:balance;
 }
@@ -1078,7 +1109,8 @@ button{background:none;border:none;cursor:pointer;}
 .chip-count{min-width:34px;}
 
 .chip-config{
-  padding:12px 6px;text-align:center;
+  min-height:48px;padding:12px 6px;text-align:center;
+  display:flex;align-items:center;justify-content:center;
   font-family:var(--f-display);font-variation-settings:var(--wide);
   font-weight:600;font-size:11.5px;text-transform:uppercase;
   letter-spacing:.05em;white-space:nowrap;
@@ -1146,7 +1178,8 @@ button{background:none;border:none;cursor:pointer;}
 .fs-cta:active{transform:scale(.985);opacity:.92;}
 .fs-cta:disabled{background:var(--sand-deep);color:var(--muted);cursor:default;}
 .fs-reset{
-  display:block;width:100%;text-align:center;margin-top:var(--sp-4);
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:48px;text-align:center;margin-top:var(--sp-2);
   font-size:var(--t-cap);color:var(--muted);padding:6px;
   text-decoration:underline;text-underline-offset:3px;
   text-decoration-color:var(--line);
@@ -1417,10 +1450,13 @@ button{background:none;border:none;cursor:pointer;}
   <!-- SHORTLIST -->
   <div class="shortlist" id="shortlist-view">
     <div class="sl-head">
-      <h2 class="sl-title">Your shortlist<em id="sl-head-n"></em></h2>
-      <button type="button" class="sl-back" onclick="closeShortlist()">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 18 5 12 11 6"/></svg>
-        Back to swiping
+      <div class="sl-head-text">
+        <h2 class="sl-title">Your shortlist<em id="sl-head-n"></em></h2>
+        <p class="sl-summary" id="sl-summary"></p>
+      </div>
+      <button type="button" class="sl-back" onclick="closeShortlist()" aria-label="Back to swiping">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="11 18 5 12 11 6"/></svg>
+        <span>Back</span>
       </button>
     </div>
     <div class="sl-body" id="sl-body"></div>
@@ -2567,6 +2603,7 @@ function openShortlist() {
         '<p class="empty-sub">Swipe right on any listing to save it here. Your shortlist builds as you go.</p>' +
       '</div>';
     document.getElementById('shortlist-view').classList.add('active');
+    paintShortlistHead();
     updateReqBtn();
     return;
   }
@@ -2576,6 +2613,47 @@ function openShortlist() {
 
 function closeShortlist() {
   document.getElementById('shortlist-view').classList.remove('active');
+}
+
+// A thumbnail whose derived poster 404s falls back to the film glyph.
+// Built as DOM, not as an attribute value — see the note on the <img>.
+function thumbFailed(img) {
+  const slot = img.parentElement;
+  if (slot) slot.innerHTML = svg('film', 20);
+}
+
+// Item 9. The shape of what the client has built, from data already
+// loaded — count, the areas represented, and the rent range.
+function shortlistSummary() {
+  const all = [...shortlists.bandra, ...shortlists.lpwpdmm, ...(shortlists.sobo||[])];
+  if (!all.length) return '';
+  // The sheet spells the same area several ways — "Bandra W", "Bandra
+  // West", "Bandra E" are all Bandra. Normalising to the base name keeps
+  // the line short and stops one area being counted three times.
+  const areas = [...new Set(all
+    .map(l => String(l.loc || '').trim()
+      .replace(/\s*\(.*\)$/, '')
+      .replace(/\s+(?:W|E|N|S|West|East|North|South)\.?$/i, '')
+      .trim())
+    .filter(Boolean))];
+  const rents = all.map(l => l.rent).filter(r => r > 0).sort((a, b) => a - b);
+  const bits = [all.length + ' flat' + (all.length > 1 ? 's' : '')];
+  if (areas.length) {
+    bits.push(areas.slice(0, 3).join(', ') + (areas.length > 3 ? ' +' + (areas.length - 3) : ''));
+  }
+  if (rents.length) {
+    const lo = rents[0], hi = rents[rents.length - 1];
+    bits.push(lo === hi ? '₹' + fmtRent(lo) : '₹' + fmtRent(lo) + '–₹' + fmtRent(hi));
+  }
+  return bits.join(' · ');
+}
+
+function paintShortlistHead() {
+  const total = [...shortlists.bandra, ...shortlists.lpwpdmm, ...(shortlists.sobo||[])].length;
+  const nEl = document.getElementById('sl-head-n');
+  if (nEl) nEl.textContent = total > 0 ? total : '';
+  const sEl = document.getElementById('sl-summary');
+  if (sEl) sEl.textContent = shortlistSummary();
 }
 
 function renderShortlist() {
@@ -2594,7 +2672,7 @@ function renderShortlist() {
       const m = getMedia(l);
       const c = coverFor(l);
       let thumb;
-      if (c) thumb = '<img src="' + c.url + '" alt="" onerror="this.replaceWith(document.createRange().createContextualFragment(\'' + svg('film',20).replace(/'/g,"\\'") + '\'))">';
+      if (c) thumb = '<img src="' + esc(c.url) + '" alt="" loading="lazy" onerror="thumbFailed(this)">';
       else if (m && m.gallery[0] && (m.gallery[0].type === 'link' || m.gallery[0].type === 'video')) thumb = svg('film',20);
       else thumb = svg('frame',20);
       const now = l.possession === 'Immediate';
@@ -2605,8 +2683,8 @@ function renderShortlist() {
           '<div class="sl-info">' +
             '<div class="sl-name">' + esc(l.building || l.micro) + '</div>' +
             '<div class="sl-rent">₹' + fmtRent(l.rent) + '<i>/mo</i></div>' +
-            '<div class="sl-meta">' + esc(l.loc) + ' · ' + esc(l.config) + ' · ' + esc(l.furn) + '</div>' +
-            '<div class="sl-when' + (now ? ' now' : '') + '">' + (now ? 'Available now' : 'From ' + esc(l.possession)) + '</div>' +
+            '<div class="sl-meta">' + esc(l.loc) + ' · ' + esc(l.config) + '</div>' +
+            (now ? '' : '<div class="sl-when">From ' + esc(l.possession) + '</div>') +
           '</div>' +
           '<button type="button" class="sl-pick' + (picked ? ' on' : '') + '" onclick="toggleView(\'' + esc(l.code) + '\',this)"' +
             ' aria-pressed="' + (picked ? 'true' : 'false') + '">' +
@@ -2617,6 +2695,7 @@ function renderShortlist() {
     }).join('');
   });
   body.innerHTML = html;
+  paintShortlistHead();
   updateReqBtn();
 }
 
