@@ -7,18 +7,18 @@
   <!-- Open Graph / WhatsApp / social preview -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Prithjyo">
-  <meta property="og:title" content="Prithjyo — Find Your Home in Mumbai">
-  <meta property="og:description" content="Swipe through curated rentals, shortlist your favourites.">
-  <meta property="og:image" content="https://prithjyo.vercel.app/preview.png">
+  <meta property="og:title" content="Prithjyo — Find Your Home">
+  <meta property="og:description" content="Every flat we have in Mumbai, at the price the landlord set. Real photos, honest dates — shortlist what you like and see them in one trip.">
+  <meta property="og:image" content="https://prithjyo.vercel.app/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://prithjyo.vercel.app">
 
   <!-- Twitter card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Prithjyo — Find Your Home in Mumbai">
-  <meta name="twitter:description" content="Swipe through curated rentals, shortlist your favourites.">
-  <meta name="twitter:image" content="https://prithjyo.vercel.app/preview.png">
+  <meta name="twitter:title" content="Prithjyo — Find Your Home">
+  <meta name="twitter:description" content="Every flat we have in Mumbai, at the price the landlord set. Real photos, honest dates — shortlist what you like and see them in one trip.">
+  <meta name="twitter:image" content="https://prithjyo.vercel.app/og.png">
 <title>Prithjyo — Find Your Home</title>
 <meta name="theme-color" content="#EDE7DB">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -192,6 +192,13 @@ button{background:none;border:none;cursor:pointer;}
   font-variant-numeric:tabular-nums;white-space:nowrap;
 }
 
+.sort-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.sort-axis{
+  font-family:var(--f-display);font-variation-settings:var(--wide);
+  font-weight:600;font-size:9.5px;text-transform:uppercase;
+  letter-spacing:.14em;color:var(--muted);white-space:nowrap;
+}
+
 /* Sort — a two-state text switch, not a coloured segmented control */
 .sort{
   display:flex;align-items:center;border:1px solid var(--line);
@@ -284,6 +291,22 @@ button{background:none;border:none;cursor:pointer;}
 }
 .media-ph svg{width:26px;height:26px;opacity:.35;}
 .media-ph span{font-size:var(--t-cap);}
+
+/* A still lifted from the walkthrough video stands in as the cover. The
+   badge says "there is motion behind this" — it reuses the film glyph
+   already used in the plate row rather than introducing a play triangle,
+   and it is inert: the whole photo is the tap target, as before. */
+.play-badge{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:46px;height:46px;border-radius:50%;
+  background:var(--clay);color:#FFF6F1;
+  display:none;align-items:center;justify-content:center;
+  pointer-events:none;
+  box-shadow:0 2px 10px rgba(20,17,12,.35),0 0 0 5px rgba(138,59,46,.16);
+}
+.card-media.from-video .play-badge{display:flex;}
+.card-media.no-cover .play-badge{display:none;}
 
 /* Scrim: only as dark as the plate needs. */
 .scrim{
@@ -488,6 +511,12 @@ button{background:none;border:none;cursor:pointer;}
 /* Narrow handsets — the dock tightens so the label stays on one line.
    The circles stay at 48px, comfortably above the 44px tap minimum. */
 @media (max-width:340px){
+  /* The axis label earns its place more than the position counter does,
+     so on the narrowest handsets the counter steps aside rather than the
+     header overflowing. Progress is still shown by the rail. */
+  .top{gap:6px;padding-left:14px;padding-right:14px;}
+  .deck-counter{display:none;}
+  .area-pill{max-width:124px;}
   .plate{left:var(--sp-3);right:var(--sp-3);gap:var(--sp-2);}
   .plate-rent{font-size:30px;}
   .plate-count{font-size:9px;letter-spacing:.12em;}
@@ -737,6 +766,110 @@ button{background:none;border:none;cursor:pointer;}
 .sheet-opt .mark{color:var(--clay);opacity:0;flex-shrink:0;transition:opacity var(--dur-1) var(--ease);}
 .sheet-opt.on .mark{opacity:1;}
 
+/* ═══════════════ REQUEST SHEET ══════════════════════════════════
+   The viewing request is the most valuable moment on the page, so it
+   gets its own considered step rather than being crammed into the
+   shortlist footer. Built on the same sheet component as the area
+   picker — same ground, same rules, same basalt action. */
+.req-sheet{max-height:88vh;display:flex;flex-direction:column;}
+.req-head{padding:0 var(--gutter) var(--sp-4);}
+/* Scoped under .req-sheet: the area picker's `.sheet h2` rule is more
+   specific than a bare class and was flattening this to a 10px label. */
+.req-sheet .req-title{
+  font-family:var(--f-display);font-variation-settings:var(--wide);
+  font-weight:800;font-size:var(--t-d3);text-transform:uppercase;
+  letter-spacing:-.012em;color:var(--ink);
+  padding:0;margin:0 0 6px;
+}
+.req-sub{font-size:var(--t-cap);color:var(--muted);line-height:1.5;max-width:34ch;}
+.req-body{
+  padding:0 var(--gutter);overflow-y:auto;-webkit-overflow-scrolling:touch;
+  flex:1;min-height:0;
+}
+.req-field{padding:var(--sp-4) 0;border-top:1px solid var(--line);}
+.req-label{
+  display:flex;align-items:baseline;gap:8px;margin-bottom:10px;
+  font-family:var(--f-display);font-variation-settings:var(--wide);
+  font-weight:600;font-size:var(--t-label);text-transform:uppercase;
+  letter-spacing:var(--track-label);color:var(--ink);
+}
+.req-label em{
+  font-style:normal;font-family:var(--f-body);font-weight:400;
+  font-size:11px;letter-spacing:0;text-transform:none;color:var(--muted);
+}
+.req-input{
+  width:100%;height:48px;padding:0 14px;
+  background:var(--sand-deep);border:1px solid var(--line);
+  border-radius:var(--r-md);color:var(--ink);
+  font-family:var(--f-body);font-size:15px;font-weight:500;
+  outline:none;-webkit-appearance:none;appearance:none;
+  transition:border-color var(--dur-1) var(--ease);
+}
+.req-input::placeholder{color:var(--muted);opacity:.75;}
+.req-input:focus{border-color:var(--ink);}
+.req-input.invalid{border-color:var(--clay);}
+.req-row{display:flex;gap:8px;}
+.req-row .req-input{min-width:0;}
+.req-prefix{
+  display:flex;align-items:center;justify-content:center;
+  height:48px;padding:0 12px;flex-shrink:0;
+  background:var(--sand-deep);border:1px solid var(--line);
+  border-radius:var(--r-md);color:var(--muted);
+  font-family:var(--f-display);font-variation-settings:var(--wide);
+  font-weight:600;font-size:13px;font-variant-numeric:tabular-nums;
+}
+.req-err{
+  font-size:11.5px;color:var(--clay);margin-top:7px;
+  display:none;
+}
+.req-err.show{display:block;}
+.req-note{
+  font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:9px;
+  display:flex;gap:6px;align-items:flex-start;
+}
+.req-note svg{flex-shrink:0;margin-top:1px;opacity:.6;}
+
+/* Day + window. A preference, never a booking. */
+.win-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+.win-chip{
+  height:48px;border-radius:var(--r-md);
+  border:1px solid var(--line);background:var(--sand-deep);color:var(--ink);
+  font-family:var(--f-display);font-variation-settings:var(--wide);
+  font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.07em;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:transform var(--dur-1) var(--ease),
+             background-color var(--dur-1) var(--ease),
+             border-color var(--dur-1) var(--ease),
+             color var(--dur-1) var(--ease);
+}
+.win-chip:active{transform:scale(.985);}
+.win-chip.on{background:var(--basalt);border-color:var(--basalt);color:var(--ink-inv);}
+
+.req-foot{
+  padding:var(--sp-4) var(--gutter) 0;flex-shrink:0;
+  border-top:1px solid var(--line);
+}
+.req-cta{
+  width:100%;height:54px;border-radius:var(--r-md);
+  background:var(--basalt);color:var(--ink-inv);
+  font-family:var(--f-display);font-variation-settings:var(--wide);
+  font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.11em;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  transition:transform var(--dur-1) var(--ease),opacity var(--dur-1) var(--ease);
+}
+.req-cta:active:not(:disabled){transform:scale(.985);opacity:.92;}
+.req-cta:disabled{background:var(--sand-deep);color:var(--muted);cursor:default;}
+.req-back{
+  display:block;width:100%;text-align:center;margin-top:10px;padding:6px;
+  font-size:var(--t-cap);color:var(--muted);
+  text-decoration:underline;text-underline-offset:3px;
+  text-decoration-color:var(--line);
+}
+
+/* Deck empty state — no listings behind the current filters. Built on
+   the same basalt plate as the other interstitials. */
+.plate-card .pc-actions{display:flex;flex-direction:column;gap:var(--sp-2);}
+
 /* ═══════════════ TOAST ══════════════════════════════════════════ */
 .toast{
   position:fixed;bottom:calc(96px + var(--safe-bottom));left:50%;
@@ -933,6 +1066,16 @@ button{background:none;border:none;cursor:pointer;}
   text-transform:uppercase;opacity:.6;margin-top:3px;
 }
 .chip-count.empty{opacity:.4;}
+/* The filter screen paints before the relay answers. The count keeps its
+   box from the first frame — a quiet dash rather than a gap that later
+   pushes the chip's text sideways. */
+.chip-count:empty::before,
+.chip-count.pending::before{
+  content:"–";color:var(--muted);opacity:.45;
+  font-family:var(--f-display);font-variation-settings:var(--wide);
+  font-weight:700;font-size:17px;
+}
+.chip-count{min-width:34px;}
 
 .chip-config{
   padding:12px 6px;text-align:center;
@@ -1073,9 +1216,8 @@ button{background:none;border:none;cursor:pointer;}
  <div class="fs-inner">
   <div class="fs-head">
     <div class="wordmark">Prithjyo</div>
-    <h1 class="fs-title">Let's narrow<br>it down.</h1>
-    <p class="fs-sub">Three questions, then you see everything we actually
-      have on our books — priced the way the landlord priced it.</p>
+    <h1 class="fs-title">Three<br>questions.</h1>
+    <p class="fs-sub">Then every flat we have, at the price the landlord set.</p>
   </div>
 
   <div class="fs-body">
@@ -1093,21 +1235,21 @@ button{background:none;border:none;cursor:pointer;}
             <span class="chip-name">South Mumbai</span>
             <span class="chip-sub">Colaba · Cuffe Parade · Malabar Hill · Peddar Road · Tardeo</span>
           </span>
-          <span class="chip-count" data-count-for="south"><span class="sr-only">listings</span></span>
+          <span class="chip-count pending" data-count-for="south"></span>
         </button>
         <button type="button" class="chip chip-area" data-group="area" data-value="central" onclick="toggleChip(this,'area')">
           <span class="chip-area-t">
             <span class="chip-name">Central Mumbai</span>
             <span class="chip-sub">Lower Parel · Worli · Prabhadevi · Dadar · Matunga · Mahim · Mahalaxmi</span>
           </span>
-          <span class="chip-count" data-count-for="central"><span class="sr-only">listings</span></span>
+          <span class="chip-count pending" data-count-for="central"></span>
         </button>
         <button type="button" class="chip chip-area" data-group="area" data-value="north" onclick="toggleChip(this,'area')">
           <span class="chip-area-t">
             <span class="chip-name">North Mumbai</span>
             <span class="chip-sub">Bandra · Khar · Santacruz · Juhu · Andheri</span>
           </span>
-          <span class="chip-count" data-count-for="north"><span class="sr-only">listings</span></span>
+          <span class="chip-count pending" data-count-for="north"></span>
         </button>
       </div>
     </section>
@@ -1240,9 +1382,12 @@ button{background:none;border:none;cursor:pointer;}
     </button>
     <div class="top-spacer"></div>
     <div class="deck-counter u-num" id="deck-counter" aria-live="polite"></div>
-    <div class="sort" id="sort-toggle" role="group" aria-label="Sort by rent">
-      <button type="button" class="sort-btn active" id="sort-asc" onclick="setSort('asc')" aria-label="Cheapest first">₹ Low</button>
-      <button type="button" class="sort-btn" id="sort-desc" onclick="setSort('desc')" aria-label="Priciest first">High</button>
+    <div class="sort-wrap">
+      <span class="sort-axis" aria-hidden="true">Price</span>
+      <div class="sort" id="sort-toggle" role="group" aria-label="Sort by price">
+        <button type="button" class="sort-btn active" id="sort-asc" onclick="setSort('asc')" aria-label="Price: low to high">Low</button>
+        <button type="button" class="sort-btn" id="sort-desc" onclick="setSort('desc')" aria-label="Price: high to low">High</button>
+      </div>
     </div>
   </header>
 
@@ -1261,7 +1406,7 @@ button{background:none;border:none;cursor:pointer;}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
       </button>
       <button type="button" class="kept-btn" onclick="openShortlist()" id="sl-btn">
-        <span id="sl-label">Keep swiping</span><span class="kept-n u-num" id="sl-badge" style="display:none">0</span>
+        <span id="sl-label">Shortlist</span><span class="kept-n u-num" id="sl-badge">0</span>
       </button>
       <button type="button" class="act act-keep" onclick="swipeCard('right')" aria-label="Keep this home">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1312,6 +1457,69 @@ button{background:none;border:none;cursor:pointer;}
     </div>
     <div class="g-dots" id="g-dots"></div>
     <div class="g-thumbs" id="g-thumbs"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ REQUEST SHEET ═══════════════════════════════
+     Items 8b + 9. A preference and a way to reach the client — no
+     booking, no backend, no third party. Everything typed here goes
+     into the WhatsApp message and nowhere else. -->
+<div class="sheet-scrim" id="req-overlay" onclick="closeRequest(event)">
+  <div class="sheet req-sheet" role="dialog" aria-label="Request viewings" aria-modal="true">
+    <div class="sheet-grip"></div>
+
+    <div class="req-head">
+      <h2 class="req-title">Request viewings</h2>
+      <p class="req-sub" id="req-summary"></p>
+    </div>
+
+    <div class="req-body">
+
+      <div class="req-field">
+        <div class="req-label">Your number <em>so we can reach you</em></div>
+        <div class="req-row">
+          <span class="req-prefix">+91</span>
+          <input class="req-input" id="req-phone" type="tel" inputmode="numeric"
+                 autocomplete="tel-national" maxlength="11" placeholder="98765 43210"
+                 aria-describedby="req-phone-err" oninput="onContactInput()">
+        </div>
+        <p class="req-err" id="req-phone-err">That doesn't look like an Indian mobile number.</p>
+        <p class="req-note">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 7.5-7 9-4-1.5-7-4.6-7-9V6z"/></svg>
+          Goes to Sharan only. Never passed to a landlord or another broker.
+        </p>
+      </div>
+
+      <div class="req-field">
+        <div class="req-label">Your name <em>optional</em></div>
+        <input class="req-input" id="req-name" type="text" autocomplete="given-name"
+               placeholder="What should we call you?" maxlength="40">
+      </div>
+
+      <div class="req-field">
+        <div class="req-label">Preferred day <em>optional</em></div>
+        <input class="req-input" id="req-date" type="date" onchange="onContactInput()">
+        <div class="win-grid" role="group" aria-label="Preferred time of day">
+          <button type="button" class="win-chip" data-win="morning"   onclick="pickWindow(this)">Morning</button>
+          <button type="button" class="win-chip" data-win="afternoon" onclick="pickWindow(this)">Afternoon</button>
+          <button type="button" class="win-chip" data-win="evening"   onclick="pickWindow(this)">Evening</button>
+        </div>
+        <p class="req-note">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          A preference, not a booking — the landlord has to agree the slot. We confirm within a few hours.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="req-foot">
+      <button type="button" class="req-cta" id="req-send" disabled onclick="sendRequest()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.24 8.23z"/></svg>
+        <span id="req-send-text">Send on WhatsApp</span>
+      </button>
+      <button type="button" class="req-back" onclick="closeRequest()">Back to my shortlist</button>
+    </div>
+
   </div>
 </div>
 
@@ -1684,6 +1892,75 @@ function svg(name, size) {
 }
 
 // ─────────────────────────────────────────────
+// COVERS
+// A fifth of the deck is video-only and used to render a grey box. The
+// still is derived from the existing Cloudinary URL by transform alone —
+// so_2.0 asks for the frame at two seconds, which skips the black opening
+// frame. No uploads, no sheet edits, and nothing here touches what the
+// relay returns: getMedia() is read, never modified.
+// ─────────────────────────────────────────────
+const CLD_VIDEO = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/video\/upload\/)(.+)$/;
+
+function posterFromVideo(url) {
+  const m = String(url || '').match(CLD_VIDEO);
+  if (!m) return null;
+  return m[1] + 'so_2.0,f_jpg,q_auto/' + m[2].replace(/\.[A-Za-z0-9]+$/, '.jpg');
+}
+
+function coverFor(l) {
+  const m = getMedia(l);
+  if (!m) return null;
+  if (m.cover) return { url: m.cover, fromVideo: false };
+  const vid = (m.gallery || []).find(g => g.type === 'video' && posterFromVideo(g.url));
+  return vid ? { url: posterFromVideo(vid.url), fromVideo: true } : null;
+}
+
+function applyCover(l) {
+  if (!l || l.isDivider) return;
+  const img = document.getElementById('cover-' + l.code);
+  if (!img) return;
+  const ph    = document.getElementById('ph-' + l.code);
+  const media = img.closest('.card-media');
+  const c = coverFor(l);
+  if (c) {
+    if (media) media.classList.toggle('from-video', c.fromVideo);
+    if (img.getAttribute('src') !== c.url) img.setAttribute('src', c.url);
+    return;
+  }
+  // Nothing to show. Say so plainly rather than leaving a spinner.
+  if (media) media.classList.add('no-cover');
+  img.style.display = 'none';
+  const m = getMedia(l);
+  const hasGallery = !!(m && m.gallery && m.gallery.length);
+  if (ph) {
+    ph.style.display = '';
+    ph.innerHTML = svg('frame', 26) +
+      '<span>' + (hasGallery ? 'Tap to view' : 'Photo coming soon') + '</span>';
+  }
+}
+
+// If the derived still 404s or the network drops it, fall back to the
+// placeholder — never a broken-image icon, and never a play badge over
+// an image that is not there.
+function coverLoaded(code) {
+  const img = document.getElementById('cover-' + code);
+  if (!img) return;
+  img.classList.add('in');
+  const ph = document.getElementById('ph-' + code);
+  if (ph) ph.style.display = 'none';
+}
+
+function coverFailed(code) {
+  const img = document.getElementById('cover-' + code);
+  if (!img) return;
+  img.style.display = 'none';
+  const media = img.closest('.card-media');
+  if (media) { media.classList.remove('from-video'); media.classList.add('no-cover'); }
+  const ph = document.getElementById('ph-' + code);
+  if (ph) { ph.style.display = ''; ph.innerHTML = '<span>Tap to view</span>'; }
+}
+
+// ─────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────
 function init() {
@@ -1849,6 +2126,7 @@ function renderCards() {
   deckEl.innerHTML = '';
 
   if (idx >= deck.length) {
+    if (deck.length === 0) { showNoMatches(); return; }
     if (!marketShown) { marketShown = true; showMarket(); }
     return;
   }
@@ -1880,18 +2158,8 @@ function renderCards() {
   attachDrag(top);
   topCard = top;
 
-  // Load cover images immediately for both visible cards
-  [deck[idx], deck[idx+1]].forEach(l => {
-    if (!l || l.isDivider) return;
-    const img = document.getElementById('cover-' + l.code);
-    if (!img) return;
-    const m = getMedia(l);
-    if (m && m.cover) {
-      img.src = m.cover;
-    } else if (m && m.gallery.length && m.gallery[0].type === 'link') {
-      showVideoOnly(l.code);
-    }
-  });
+  // Load covers immediately for both visible cards
+  [deck[idx], deck[idx+1]].forEach(applyCover);
 }
 
 function showVideoOnly(code) {
@@ -1928,11 +2196,12 @@ function buildCard(l, isTop) {
         ICO.frame.replace('<svg ','<svg width="26" height="26" ') +
         '<span>Loading photo</span>' +
       '</div>' +
-      '<img id="cover-' + esc(l.code) + '" src="" alt="' +
+      '<img id="cover-' + esc(l.code) + '" alt="' +
         esc((l.building || l.micro) + ', ' + l.loc) + '"' +
-        ' onload="this.classList.add(\'in\');var p=document.getElementById(\'ph-' + esc(l.code) + '\');if(p)p.style.display=\'none\';"' +
-        ' onerror="var p=document.getElementById(\'ph-' + esc(l.code) + '\');if(p)p.innerHTML=\'<span>Tap to view</span>\';">' +
+        ' onload="coverLoaded(\'' + esc(l.code) + '\')"' +
+        ' onerror="coverFailed(\'' + esc(l.code) + '\')">' +
       '<div class="scrim"></div>' +
+      '<div class="play-badge">' + svg('film', 20) + '</div>' +
       '<div class="veil"></div>' +
       '<div class="avail' + (now ? '' : ' later') + '">' + availText + '</div>' +
       '<div class="plate">' +
@@ -2165,10 +2434,10 @@ function updateBadge(animate) {
   const btn   = document.getElementById('sl-btn');
   if (badge) {
     badge.textContent = total;
-    badge.style.display = total > 0 ? 'inline-flex' : 'none';
+    badge.style.display = 'inline-flex';
     if (animate && total > 0) bumpKept(badge, btn);
   }
-  if (label) label.textContent = total > 0 ? 'Shortlist' : 'Keep swiping';
+  if (label) label.textContent = 'Shortlist';
   const headN = document.getElementById('sl-head-n');
   if (headN) headN.textContent = total > 0 ? total : '';
 }
@@ -2251,6 +2520,27 @@ function showMarket() {
   setProgress(1);
 }
 
+// Nothing behind the current filters. The deck used to render the closing
+// summary with no rows in it, which read as a fault rather than a result.
+function showNoMatches() {
+  const el = document.createElement('div');
+  el.className = 'plate-card';
+  el.innerHTML =
+    '<div class="pc-label">Nothing matched</div>' +
+    '<h2 class="pc-title">No flats<br>on that brief</h2>' +
+    '<p class="pc-sub">We hold nothing in that combination today. Widening the ' +
+    'budget a little, or adding a second area, usually turns something up.</p>' +
+    '<div class="pc-spacer"></div>' +
+    '<div class="pc-btns">' +
+      '<button type="button" class="pc-btn primary" onclick="showFilterScreen()">Change the search</button>' +
+    '</div>';
+  document.getElementById('deck').appendChild(el);
+  enterCard(el);
+  setProgress(0);
+  const counter = document.getElementById('deck-counter');
+  if (counter) counter.textContent = '';
+}
+
 function replayDeck() {
   idx = 0;
   marketShown = false;
@@ -2302,8 +2592,9 @@ function renderShortlist() {
     html += '<div class="sl-group">' + label + ' <span style="opacity:.6">· ' + items.length + '</span></div>';
     html += items.map(l => {
       const m = getMedia(l);
+      const c = coverFor(l);
       let thumb;
-      if (m && m.cover) thumb = '<img src="' + m.cover + '" alt="">';
+      if (c) thumb = '<img src="' + c.url + '" alt="" onerror="this.replaceWith(document.createRange().createContextualFragment(\'' + svg('film',20).replace(/'/g,"\\'") + '\'))">';
       else if (m && m.gallery[0] && (m.gallery[0].type === 'link' || m.gallery[0].type === 'video')) thumb = svg('film',20);
       else thumb = svg('frame',20);
       const now = l.possession === 'Immediate';
@@ -2354,17 +2645,126 @@ function updateReqBtn() {
   if (hint) {
     const kept = [...shortlists.bandra, ...shortlists.lpwpdmm, ...(shortlists.sobo||[])].length;
     hint.textContent = n > 0
-      ? 'Opens WhatsApp with ' + (n > 1 ? 'these ' + n : 'this one') + ' ready to send'
+      ? 'Next: your number and a preferred day'
       : kept > 0 ? 'Mark the ones you want to view' : '';
   }
 }
 
-function requestViewings() {
+// The old line composed from location fields only, so a listing whose
+// micro-locality equalled its locality printed the same place twice and
+// the building name never appeared at all. building and config were
+// already being read from the sheet — this is formatting, not data.
+function listingLine(l, i) {
+  const seen = new Set();
+  const place = [l.building, l.micro, l.loc]
+    .map(v => (v == null ? '' : String(v)).trim())
+    .filter(v => {
+      if (!v || v === '-') return false;
+      const k = v.toLowerCase();
+      if (seen.has(k)) return false;      // never the same value twice
+      seen.add(k);
+      return true;
+    });
+  const bits = [];
+  if (place.length) bits.push(place.join(', '));   // no dangling comma
+  if (l.config) bits.push(l.config);
+  bits.push('₹' + fmtRent(l.rent) + '/mo');
+  return (i + 1) + '. ' + bits.join(' — ') + (l.code ? '  (' + l.code + ')' : '');
+}
+
+function selectedListings() {
   const all = [...shortlists.bandra, ...shortlists.lpwpdmm, ...(shortlists.sobo||[])];
-  const sel = all.filter(l => viewReqs.has(l.code));
-  const list = sel.map((l, i) => (i + 1) + '. ' + l.micro + ', ' + l.loc + ' — ₹' + fmtRent(l.rent) + '/mo').join('\n');
-  const msg = 'Hi Sharan,\n\nI went through the Prithjyo listings and would like to view:\n\n' + list + '\n\nWhen can we arrange?';
-  window.open('https://wa.me/917039667507?text=' + encodeURIComponent(msg), '_blank');
+  return all.filter(l => viewReqs.has(l.code));
+}
+
+// ─────────────────────────────────────────────
+// REQUEST SHEET — items 8b and 9
+// A preference and a way to be reached. Nothing is stored: the values go
+// into the WhatsApp message and nowhere else.
+// ─────────────────────────────────────────────
+let reqWindow = null;
+
+function todayISO() {
+  const d = new Date(), p = v => String(v).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+
+function requestViewings() {
+  const n = viewReqs.size;
+  if (!n) return;
+  document.getElementById('req-summary').textContent =
+    n + ' home' + (n > 1 ? 's' : '') + '. We confirm within a few hours — the landlord has to agree the slot.';
+  const d = document.getElementById('req-date');
+  if (d && !d.min) d.min = todayISO();
+  document.getElementById('req-overlay').classList.add('open');
+  onContactInput();
+}
+
+function closeRequest(e) {
+  if (e && e.target && e.target.id !== 'req-overlay') return;
+  document.getElementById('req-overlay').classList.remove('open');
+}
+
+function pickWindow(btn) {
+  const wasOn = btn.classList.contains('on');
+  document.querySelectorAll('.win-chip').forEach(c => c.classList.remove('on'));
+  if (wasOn) { reqWindow = null; return; }        // tap again to clear
+  btn.classList.add('on');
+  reqWindow = btn.dataset.win;
+}
+
+function cleanPhone(v) {
+  return String(v || '').replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
+}
+function phoneOk(v) { return /^[6-9]\d{9}$/.test(cleanPhone(v)); }
+
+// Light validation — it flags only once enough digits are in, so nobody
+// is told they are wrong while still typing.
+function onContactInput() {
+  const el = document.getElementById('req-phone');
+  if (!el) return;
+  const ok = phoneOk(el.value);
+  const settled = cleanPhone(el.value).length >= 10;
+  el.classList.toggle('invalid', settled && !ok);
+  document.getElementById('req-phone-err').classList.toggle('show', settled && !ok);
+  document.getElementById('req-send').disabled = !ok;
+}
+
+function preferredLine() {
+  const v = (document.getElementById('req-date') || {}).value || '';
+  let day = '';
+  if (v) {
+    const dt = new Date(v + 'T12:00:00');
+    // Formatted from fixed arrays rather than toLocaleDateString, which
+    // renders "Sept" on some devices and "Sep" on others — the message
+    // should read identically whoever sends it.
+    if (!isNaN(dt)) {
+      const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const MON  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      day = DAYS[dt.getDay()] + ' ' + dt.getDate() + ' ' + MON[dt.getMonth()];
+    }
+  }
+  const parts = [day, reqWindow].filter(Boolean);
+  return parts.length ? 'Preferred: ' + parts.join(', ') : '';
+}
+
+function composeRequest() {
+  const sel = selectedListings();
+  const phone = cleanPhone((document.getElementById('req-phone') || {}).value);
+  const name  = ((document.getElementById('req-name') || {}).value || '').trim();
+  const pref  = preferredLine();
+  const lines = ['Hi Sharan,', '', 'I went through the Prithjyo listings and would like to view:', '',
+                 sel.map(listingLine).join('\n'), ''];
+  if (pref) lines.push(pref);
+  lines.push((name ? name + ' · ' : '') + '+91 ' + phone.slice(0, 5) + ' ' + phone.slice(5));
+  if (!pref) lines.push('', 'When can we arrange?');
+  return lines.join('\n');
+}
+
+function sendRequest() {
+  if (!selectedListings().length) return;
+  if (!phoneOk((document.getElementById('req-phone') || {}).value)) return;
+  window.open('https://wa.me/917039667507?text=' + encodeURIComponent(composeRequest()), '_blank');
 }
 
 // ─────────────────────────────────────────────
@@ -2527,6 +2927,7 @@ function paintAreaCounts() {
     if (!el) return;
     const n = (LISTINGS[map[area]] || []).length;
     el.innerHTML = n + '<em>' + (n === 1 ? 'home' : 'homes') + '</em>';
+    el.classList.remove('pending');   // real number in — release the placeholder
     el.classList.toggle('empty', n === 0);
   });
   const zoneLabels = {
@@ -2835,9 +3236,7 @@ function undoSwipe() {
   setTimeout(() => {
     const l = deck[idx];
     if (!l || l.isDivider) return;
-    const img = document.getElementById('cover-' + l.code);
-    const m = getMedia(l);
-    if (img && m && m.cover) img.src = m.cover;
+    applyCover(l);
   }, 50);
   lastSwipedLeft = null;
   setUndo(false);
@@ -2913,6 +3312,10 @@ document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeGallery();
     return;
   }
+  if (document.getElementById('req-overlay').classList.contains('open')) {
+    if (e.key === 'Escape') closeRequest();
+    return;
+  }
   if (document.getElementById('shortlist-view').classList.contains('active')) {
     if (e.key === 'Escape') closeShortlist();
     return;
@@ -2927,19 +3330,9 @@ document.addEventListener('keydown', e => {
 
 // Load cover images for every card already in the DOM
 function loadCoverImages() {
-  const allListings = [...LISTINGS.bandra, ...LISTINGS.lpwpdmm, ...(LISTINGS.sobo||[])];
-  allListings.forEach(l => {
-    const img = document.getElementById('cover-' + l.code);
-    if (!img) return;
-    const media = getMedia(l);
-    if (media && media.cover) {
-      img.src = media.cover;
-    } else if (media && media.gallery.length && media.gallery[0].type === 'link') {
-      showVideoOnly(l.code);
-    }
-    // No stock-photo fallback — a blank plate is more honest than a
-    // picture of somebody else's flat.
-  });
+  // No stock-photo fallback anywhere — a blank plate is more honest than
+  // a picture of somebody else's flat.
+  [...LISTINGS.bandra, ...LISTINGS.lpwpdmm, ...(LISTINGS.sobo||[])].forEach(applyCover);
 }
 
 // Hide swipe view — filter screen shows first
