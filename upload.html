@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prithjyo — Photo Upload</title>
+<meta name="theme-color" content="#0F1E2E">
+<title>Prithjyo — Add Listing</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -16,15 +17,14 @@
   --green:#2D7A4F;
   --green-bg:#EAF4EE;
   --red:#C0392B;
+  --red-soft:#E8776B;
+  --amber:#D9A441;
   --text-sec:#4A6070;
   --text-muted:#7A8E9A;
   --white:#FFFFFF;
 }
-html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:var(--navy);color:var(--white);}
-
-/* ── VIDEO TAG ── */
-.video-tag{margin-top:14px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream);background:var(--navy-mid);border:1px solid var(--navy-light);border-radius:12px;padding:13px 14px;}
-.video-remove{margin-left:auto;background:none;border:none;color:var(--red);font-size:12px;cursor:pointer;font-family:inherit;}
+html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:var(--navy);color:var(--white);-webkit-text-size-adjust:100%;}
+button{font-family:inherit;}
 
 /* ── LOCK SCREEN ── */
 #lock{
@@ -52,11 +52,14 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
 .lock-error{font-size:13px;color:var(--red);min-height:18px;}
 
 /* ── MAIN APP ── */
-#app{display:none;max-width:640px;margin:0 auto;padding:32px 20px 60px;}
-
+#app{display:none;max-width:680px;margin:0 auto;padding:32px 20px 120px;}
 .logo{font-family:'DM Serif Display',serif;font-size:18px;color:var(--gold);letter-spacing:.08em;margin-bottom:6px;}
 .page-title{font-family:'DM Serif Display',serif;font-size:28px;color:var(--cream);margin-bottom:6px;}
-.page-sub{font-size:13px;color:var(--text-muted);margin-bottom:36px;line-height:1.6;}
+.page-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.6;}
+.switch{display:inline-flex;background:var(--navy-mid);border:1px solid var(--navy-light);border-radius:12px;padding:3px;margin:0 0 16px;}
+.switch a{color:var(--text-muted);text-decoration:none;font-size:13px;font-weight:600;padding:9px 18px;border-radius:9px;min-height:36px;display:flex;align-items:center;}
+.switch a.on{background:var(--gold);color:var(--navy);}
+.build-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--navy-light);border-radius:20px;padding:3px 11px;margin-bottom:10px;}
 
 /* ── FORM ── */
 .field{margin-bottom:20px;}
@@ -65,118 +68,203 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
   width:100%;padding:13px 14px;
   background:var(--navy-mid);border:1.5px solid var(--navy-light);
   border-radius:12px;color:var(--white);font-size:15px;font-weight:500;
-  outline:none;transition:border-color .15s;font-family:inherit;
+  outline:none;transition:border-color .15s,box-shadow .15s;font-family:inherit;min-height:48px;
 }
 .input:focus{border-color:var(--gold);}
-.input::placeholder{color:var(--text-muted);}
+.input::placeholder{color:var(--text-muted);font-weight:400;}
+textarea.input{min-height:64px;resize:vertical;font-family:inherit;}
+.input.is-auto{border-color:rgba(76,175,80,.55);}
+.input.is-check{border-color:var(--amber);}
+.input.is-conflict{border-color:var(--red);}
+.section-head{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:30px 0 4px;padding-top:18px;border-top:1px solid var(--navy-light);}
+.section-sub{font-size:11px;color:var(--text-muted);margin-bottom:14px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:520px){.grid2{grid-template-columns:1fr;gap:0;}}
+.req{color:var(--gold);}
 
-/* ── DROP ZONE ── */
+/* ── FIELD FLAGS (from the Smart Reader) ── */
+.flag{font-size:12px;line-height:1.5;margin-top:7px;display:none;}
+.flag.flag-ok,.flag.flag-check,.flag.flag-conflict,.flag.flag-info{display:block;}
+.flag-ic{display:inline-block;width:14px;font-size:9px;vertical-align:1px;}
+.flag-ok{color:#6FBF73;}
+.flag-check{color:var(--amber);}
+.flag-conflict{color:var(--red-soft);}
+.flag-info{color:var(--text-muted);}
+.flag-extra{color:var(--text-muted);margin-top:2px;padding-left:14px;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.chip{
+  background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.45);color:var(--cream);
+  border-radius:999px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;min-height:40px;
+}
+.chip:active,.chip:hover{background:var(--gold);color:var(--navy);}
+
+/* ── SMART READER ── */
+.reader{background:var(--navy-mid);border:1px solid var(--navy-light);border-radius:18px;padding:16px;margin-bottom:6px;}
+.reader-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.reader-title{font-family:'DM Serif Display',serif;font-size:19px;color:var(--cream);}
+.reader-title small{display:block;font-family:'Inter',sans-serif;font-size:12px;color:var(--text-muted);margin-top:2px;}
+.seg{display:inline-flex;background:var(--navy);border:1px solid var(--navy-light);border-radius:10px;padding:2px;}
+.seg-btn{background:none;border:none;color:var(--text-muted);font-size:12px;font-weight:600;padding:8px 12px;border-radius:8px;cursor:pointer;min-height:36px;}
+.seg-btn.active{background:var(--gold);color:var(--navy);}
+.msg-input{min-height:150px;font-size:14px;line-height:1.55;font-weight:400;resize:vertical;}
+.reader-actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.btn-gold{background:var(--gold);color:var(--navy);border:none;border-radius:12px;font-size:15px;font-weight:700;padding:0 20px;min-height:48px;cursor:pointer;flex:1 1 180px;transition:opacity .15s;}
+.btn-gold:disabled{opacity:.35;cursor:default;}
+.btn-gold:not(:disabled):active{opacity:.85;}
+.btn-ghost{background:transparent;color:var(--cream);border:1px solid var(--navy-light);border-radius:12px;font-size:14px;font-weight:600;padding:0 16px;min-height:48px;cursor:pointer;}
+.btn-ghost:hover{border-color:var(--gold);}
+.btn-ghost:disabled{opacity:.4;cursor:default;}
+
+.r-banner{border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.55;margin-top:12px;border:1px solid;}
+.r-banner.red{background:rgba(192,57,43,.12);border-color:rgba(192,57,43,.55);color:#F1B3AB;}
+.r-banner.amber{background:rgba(217,164,65,.1);border-color:rgba(217,164,65,.5);color:#EBD39D;}
+.r-banner button{margin-top:8px;}
+.r-summary{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center;}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:6px 12px;border:1px solid;}
+.pill.ok{color:#6FBF73;border-color:rgba(111,191,115,.5);background:rgba(111,191,115,.08);}
+.pill.check{color:var(--amber);border-color:rgba(217,164,65,.5);background:rgba(217,164,65,.08);}
+.pill.conflict{color:var(--red-soft);border-color:rgba(232,119,107,.5);background:rgba(232,119,107,.08);}
+.pill.need{color:var(--cream);border-color:var(--navy-light);background:var(--navy);}
+.r-multi{margin-top:12px;}
+.r-multi-title{font-size:12px;color:var(--text-muted);margin-bottom:8px;}
+.r-multi-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.r-multi-btns .chip.active{background:var(--gold);color:var(--navy);}
+.r-multi-btns .chip.done{opacity:.55;}
+details.r-detail{margin-top:12px;border-top:1px solid var(--navy-light);padding-top:10px;}
+details.r-detail summary{font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;list-style:none;min-height:32px;display:flex;align-items:center;}
+details.r-detail summary::-webkit-details-marker{display:none;}
+details.r-detail summary::before{content:'▸';margin-right:7px;font-size:10px;transition:transform .15s;}
+details.r-detail[open] summary::before{transform:rotate(90deg);}
+.r-detail pre{white-space:pre-wrap;word-break:break-word;font-family:'Inter',sans-serif;font-size:12.5px;line-height:1.6;color:var(--cream);background:rgba(0,0,0,.25);border-radius:10px;padding:12px;margin-top:8px;max-height:240px;overflow:auto;}
+.r-detail ul{margin:8px 0 0 18px;font-size:12.5px;line-height:1.7;color:var(--text-muted);}
+.r-detail .r-sub{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-top:12px;font-weight:700;}
+
+/* ── MEDIA: DROP ZONE + TILES ── */
 .drop-zone{
   border:2px dashed var(--navy-light);border-radius:16px;
-  padding:40px 24px;text-align:center;cursor:pointer;
-  transition:all .2s;background:var(--navy-mid);
-  position:relative;
+  padding:34px 24px;text-align:center;cursor:pointer;
+  transition:all .2s;background:var(--navy-mid);position:relative;
 }
-.drop-zone.drag-over{border-color:var(--gold);background:rgba(201,168,76,.06);}
+.drop-zone.compact{padding:18px 20px;}
+.drop-zone.drag-over{border-color:var(--gold);background:rgba(201,168,76,.08);transform:scale(1.005);}
 .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.dz-icon{font-size:36px;margin-bottom:12px;}
+.dz-icon{margin-bottom:10px;color:var(--gold);}
+.dz-icon svg{width:38px;height:38px;}
+.compact .dz-icon{display:none;}
 .dz-title{font-size:15px;font-weight:600;color:var(--cream);margin-bottom:4px;}
-.dz-sub{font-size:12px;color:var(--text-muted);}
-
-/* ── PHOTO PREVIEW GRID ── */
-.photo-grid{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));
-  gap:10px;margin-top:16px;
+.dz-sub{font-size:12px;color:var(--text-muted);line-height:1.5;}
+.media-meta{font-size:12px;color:var(--text-muted);margin-top:10px;min-height:16px;}
+.media-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin:14px 0 8px;}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;}
+.tile{
+  position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;background:var(--navy-light);
+  cursor:grab;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;
+  outline:none;border:1.5px solid transparent;
 }
-.photo-item{
-  position:relative;border-radius:10px;overflow:hidden;
-  aspect-ratio:4/3;background:var(--navy-light);
-}
-.photo-item img{width:100%;height:100%;object-fit:cover;display:block;}
-.photo-badge{
-  position:absolute;top:6px;left:6px;
-  background:rgba(15,30,46,.85);color:var(--gold);
-  font-size:10px;font-weight:700;padding:3px 7px;border-radius:8px;
-}
-.photo-remove{
-  position:absolute;top:6px;right:6px;
-  background:rgba(192,57,43,.9);color:white;
-  border:none;border-radius:50%;width:22px;height:22px;
-  font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  line-height:1;
-}
-.photo-order{
-  position:absolute;bottom:6px;left:6px;right:6px;
-  display:flex;gap:4px;justify-content:center;
-}
-.order-btn{
-  background:rgba(15,30,46,.85);color:var(--cream);
-  border:none;border-radius:6px;padding:3px 8px;font-size:11px;
-  cursor:pointer;font-family:inherit;
-}
-.order-btn:active{background:var(--gold);color:var(--navy);}
-
-/* ── ORDER HINT ── */
-.order-hint{
-  font-size:12px;color:var(--text-muted);margin-top:10px;line-height:1.6;
-  background:rgba(255,255,255,.04);border-radius:10px;padding:12px 14px;
-}
+.tile:focus-visible{border-color:var(--gold);}
+.tile img,.tile video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none;}
+.tile .nopreview{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;color:var(--text-muted);padding:8px;}
+.tile-badge{position:absolute;top:6px;left:6px;background:rgba(15,30,46,.88);color:var(--gold);font-size:10px;font-weight:700;padding:3px 7px;border-radius:8px;}
+.tile-x{position:absolute;top:5px;right:5px;background:rgba(192,57,43,.92);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.tile-cover{position:absolute;top:5px;right:36px;background:rgba(15,30,46,.88);color:var(--cream);border:none;border-radius:50%;width:26px;height:26px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.tile-cover:hover{background:var(--gold);color:var(--navy);}
+.tile-grip{position:absolute;left:6px;bottom:6px;background:rgba(15,30,46,.88);color:var(--cream);border-radius:8px;padding:4px 7px;font-size:14px;line-height:1;touch-action:none;cursor:grab;}
+.tile-meta{position:absolute;right:6px;bottom:6px;background:rgba(15,30,46,.82);color:var(--cream);font-size:10px;padding:3px 6px;border-radius:7px;}
+.tile-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:rgba(15,30,46,.7);color:var(--cream);display:flex;align-items:center;justify-content:center;font-size:13px;pointer-events:none;}
+.tile-bar{position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(0,0,0,.45);display:none;}
+.tile-bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .15s;}
+.tile.uploading .tile-bar,.tile.done .tile-bar,.tile.error .tile-bar{display:block;}
+.tile.done .tile-bar i{background:#4CAF50;width:100%!important;}
+.tile.error .tile-bar i{background:var(--red);width:100%!important;}
+.tile.uploading .tile-x,.tile.uploading .tile-grip,.tile.uploading .tile-cover{display:none;}
+.tile-warn{position:absolute;left:6px;top:34px;background:rgba(217,164,65,.95);color:#2a1d00;font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;}
+.tile.dragging{opacity:.25;}
+.tile.ghost{position:fixed;z-index:3000;pointer-events:none;box-shadow:0 14px 34px rgba(0,0,0,.55);transform:scale(1.06) rotate(1.5deg);opacity:.96;cursor:grabbing;margin:0;}
+body.is-dragging{cursor:grabbing;}
+body.is-dragging *{cursor:grabbing!important;}
+.order-hint{font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.6;background:rgba(255,255,255,.04);border-radius:10px;padding:12px 14px;}
 .order-hint strong{color:var(--cream);}
 
-/* ── UPLOAD BTN ── */
+/* ── ACTION BAR ── */
+.action-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  background:linear-gradient(to top,var(--navy) 62%,rgba(15,30,46,0));
+  padding:22px 20px calc(14px + env(safe-area-inset-bottom));display:none;
+}
+.action-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:14px;}
+.action-status{font-size:12px;color:var(--text-muted);line-height:1.45;flex:1 1 auto;min-width:0;}
+.action-status b{color:var(--cream);}
 .upload-btn{
-  width:100%;padding:16px;margin-top:24px;
+  flex:0 0 auto;padding:0 26px;min-height:52px;
   background:var(--gold);color:var(--navy);
   border:none;border-radius:14px;font-size:16px;font-weight:700;
-  cursor:pointer;font-family:inherit;transition:opacity .15s;
-  letter-spacing:.01em;
+  cursor:pointer;font-family:inherit;transition:opacity .15s;letter-spacing:.01em;
 }
 .upload-btn:disabled{opacity:.35;cursor:default;}
 .upload-btn:not(:disabled):active{opacity:.85;}
+@media(max-width:480px){.action-inner{flex-direction:column;align-items:stretch;gap:8px}.upload-btn{width:100%}.action-status{text-align:center}}
 
-/* ── PROGRESS ── */
-.progress-wrap{margin-top:20px;display:none;}
-.progress-label{font-size:13px;color:var(--text-muted);margin-bottom:8px;}
-.progress-bar{height:4px;background:var(--navy-light);border-radius:2px;overflow:hidden;}
-.progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .3s ease;width:0%;}
-
-/* ── RESULT ── */
-.result{
-  margin-top:24px;display:none;
-  background:var(--navy-mid);border:1px solid var(--navy-light);
-  border-radius:14px;padding:20px;
-}
+/* ── RESULT / STATUS ── */
+.result{margin-top:24px;display:none;background:var(--navy-mid);border:1px solid var(--navy-light);border-radius:14px;padding:20px;}
 .result-title{font-size:13px;font-weight:700;color:var(--gold);margin-bottom:12px;letter-spacing:.06em;text-transform:uppercase;}
-.result-code{
-  background:rgba(0,0,0,.3);border-radius:10px;padding:14px;
-  font-family:'Courier New',monospace;font-size:11px;color:var(--cream);
-  white-space:pre-wrap;word-break:break-all;line-height:1.6;
-  max-height:200px;overflow-y:auto;
-}
-.copy-btn{
-  margin-top:12px;padding:10px 20px;
-  background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);
-  color:var(--gold);border-radius:10px;font-size:13px;font-weight:600;
-  cursor:pointer;font-family:inherit;transition:all .15s;
-}
+.copy-btn{margin-top:12px;padding:12px 20px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:var(--gold);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;min-height:44px;}
 .copy-btn:active{background:var(--gold);color:var(--navy);}
-.result-note{font-size:12px;color:var(--text-muted);margin-top:12px;line-height:1.6;}
-
-/* ── STATUS MESSAGES ── */
+.result-note{font-size:13px;color:var(--cream);margin-top:6px;line-height:1.6;}
 .status{font-size:13px;margin-top:12px;min-height:20px;line-height:1.5;}
-.status.error{color:var(--red);}
+.status.error{color:var(--red-soft);}
 .status.success{color:#4CAF50;}
 .status.info{color:var(--text-muted);}
 
-/* ── DIVIDER ── */
-.divider{border:none;border-top:1px solid var(--navy-light);margin:28px 0;}
-  .section-head{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin:30px 0 4px;padding-top:18px;border-top:1px solid var(--navy-light);}
-  .section-sub{font-size:11px;color:var(--text-muted);margin-bottom:14px;}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-  @media(max-width:520px){.grid2{grid-template-columns:1fr;}}
-  .req{color:var(--gold);}
-  textarea.input{min-height:64px;resize:vertical;font-family:inherit;}
-  .build-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--navy-light);border-radius:20px;padding:3px 11px;margin-bottom:10px;}
+/* ── REVIEW SHEET ── */
+.sheet-backdrop{position:fixed;inset:0;z-index:2000;background:rgba(5,12,20,.72);display:none;align-items:flex-end;justify-content:center;}
+.sheet-backdrop.open{display:flex;}
+.sheet{background:var(--navy);border:1px solid var(--navy-light);border-radius:22px 22px 0 0;width:100%;max-width:640px;max-height:94vh;display:flex;flex-direction:column;box-shadow:0 -20px 60px rgba(0,0,0,.5);animation:sheetUp .22s ease;}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+@media(min-width:720px){.sheet-backdrop{align-items:center;padding:24px}.sheet{border-radius:22px;max-height:90vh}}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid var(--navy-light);}
+.sheet-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--cream);}
+.sheet-x{background:none;border:none;color:var(--text-muted);font-size:26px;line-height:1;cursor:pointer;width:44px;height:44px;border-radius:50%;}
+.sheet-x:hover{color:var(--white);}
+.sheet-body{padding:16px 20px;overflow-y:auto;flex:1 1 auto;-webkit-overflow-scrolling:touch;}
+.sheet-foot{display:flex;gap:10px;padding:14px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--navy-light);}
+.sheet-foot .btn-gold{flex:1 1 auto;}
+.rv-card{display:flex;gap:14px;background:var(--navy-mid);border:1px solid var(--navy-light);border-radius:16px;overflow:hidden;margin-bottom:16px;}
+.rv-cover{width:112px;flex:0 0 112px;background:var(--navy-light);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:11px;text-align:center;}
+.rv-cover img,.rv-cover video{width:100%;height:100%;object-fit:cover;display:block;}
+.rv-card-body{padding:12px 12px 12px 0;min-width:0;flex:1;}
+.rv-name{font-family:'DM Serif Display',serif;font-size:18px;color:var(--cream);line-height:1.25;word-break:break-word;}
+.rv-line{font-size:12.5px;color:var(--text-muted);margin-top:3px;line-height:1.5;}
+.rv-rent{font-size:20px;font-weight:700;color:var(--gold);margin-top:6px;}
+.rv-rent small{font-size:12px;font-weight:500;color:var(--text-muted);}
+.rv-checks{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.rv-check{border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.55;border:1px solid;}
+.rv-check.block{background:rgba(192,57,43,.12);border-color:rgba(192,57,43,.55);color:#F1B3AB;}
+.rv-check.warn{background:rgba(217,164,65,.09);border-color:rgba(217,164,65,.45);color:#EBD39D;}
+.rv-check.good{background:rgba(111,191,115,.08);border-color:rgba(111,191,115,.4);color:#A8D8AB;}
+.rv-check label{display:flex;gap:10px;align-items:flex-start;margin-top:8px;cursor:pointer;font-weight:600;}
+.rv-check input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);flex:0 0 auto;margin-top:1px;}
+.rv-group{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--gold);margin:16px 0 6px;}
+.rv-group small{text-transform:none;letter-spacing:0;font-weight:400;color:var(--text-muted);margin-left:6px;}
+.rv-row{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid rgba(36,61,85,.7);font-size:13.5px;align-items:flex-start;}
+.rv-k{flex:0 0 118px;color:var(--text-muted);font-size:12.5px;}
+.rv-v{flex:1;min-width:0;color:var(--cream);word-break:break-word;line-height:1.5;}
+.rv-v.empty{color:var(--text-muted);}
+.rv-v.flagged{color:#EBD39D;}
+.rv-v .rv-why{display:block;font-size:11.5px;color:var(--amber);margin-top:2px;}
+.rv-edit{background:none;border:none;color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;padding:6px 4px;min-height:32px;}
+.rv-strip{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;-webkit-overflow-scrolling:touch;}
+.rv-thumb{position:relative;flex:0 0 78px;height:58px;border-radius:9px;overflow:hidden;background:var(--navy-light);}
+.rv-thumb img,.rv-thumb video{width:100%;height:100%;object-fit:cover;display:block;}
+.rv-thumb span{position:absolute;left:3px;top:3px;background:rgba(15,30,46,.88);color:var(--gold);font-size:9px;font-weight:700;padding:2px 5px;border-radius:6px;}
+.up-row{display:flex;align-items:center;gap:10px;font-size:12.5px;padding:7px 0;border-bottom:1px solid rgba(36,61,85,.6);}
+.up-name{flex:1;min-width:0;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.up-st{flex:0 0 auto;color:var(--text-muted);font-variant-numeric:tabular-nums;}
+.up-st.ok{color:#6FBF73}.up-st.err{color:var(--red-soft)}
+.up-overall{height:6px;background:var(--navy-light);border-radius:3px;overflow:hidden;margin:6px 0 4px;}
+.up-overall i{display:block;height:100%;width:0;background:var(--gold);transition:width .2s;}
+.toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%) translateY(10px);background:var(--navy-mid);color:var(--cream);border:1px solid var(--navy-light);border-radius:12px;padding:10px 16px;font-size:13px;z-index:2500;opacity:0;pointer-events:none;transition:all .2s;max-width:90vw;text-align:center;line-height:1.45;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
 </head>
 <body>
@@ -184,7 +272,7 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
 <!-- LOCK SCREEN -->
 <div id="lock">
   <div class="lock-logo">Prithjyo</div>
-  <div class="lock-title">Internal Tool — Photo Upload</div>
+  <div class="lock-title">Internal Tool — Add Listing</div>
   <input class="lock-input" type="password" id="lock-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')unlock()">
   <button class="lock-btn" onclick="unlock()">Enter</button>
   <div class="lock-error" id="lock-error"></div>
@@ -193,127 +281,143 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
 <!-- MAIN APP -->
 <div id="app">
   <div class="logo">Prithjyo</div>
-  <div class="build-tag">Add-Listing · build v2</div>
+  <div class="switch" role="navigation" aria-label="Tool"><a href="/upload.html" class="on">Flats</a><a href="/rooms.html" class="">Rooms</a></div>
+  <div class="build-tag">Add-Listing · build v3 · smart reader</div>
   <div class="page-title">Add a Listing</div>
-  <div class="page-sub">Fill in the details, drop the photos + video, and hit Add Listing. It writes the row and the media to the sheet in one go — live instantly, no deploy, no touching the sheet directly.</div>
+  <div class="page-sub">Paste a WhatsApp message or Facebook post and the form fills itself, or type everything by hand. Drop the photos + video, check the review, and add. It writes the row and the media to the sheet in one go — live instantly, no deploy, no touching the sheet directly.</div>
+
+  <!-- SMART READER -->
+  <section class="reader" id="reader">
+    <div class="reader-head">
+      <div class="reader-title">Smart Reader<small>Reads only what the message says. Nothing is guessed.</small></div>
+      <div class="seg" role="group" aria-label="Where is the message from?">
+        <button type="button" class="seg-btn active" data-src="auto">Auto</button>
+        <button type="button" class="seg-btn" data-src="whatsapp">WhatsApp</button>
+        <button type="button" class="seg-btn" data-src="facebook">Facebook</button>
+      </div>
+    </div>
+    <textarea class="input msg-input" id="msg-input" placeholder="Paste the WhatsApp message or Facebook post here…" spellcheck="false"></textarea>
+    <div class="reader-actions">
+      <button type="button" class="btn-gold" id="read-btn" disabled>Read message &#8594;</button>
+      <button type="button" class="btn-ghost" id="paste-btn">Paste</button>
+      <button type="button" class="btn-ghost" id="clear-msg">Clear</button>
+    </div>
+    <div id="reader-out" aria-live="polite"></div>
+  </section>
 
   <div class="section-head">Listing details</div>
-  <div class="section-sub">Fields marked <span class="req">*</span> are required.</div>
+  <div class="section-sub">Fields marked <span class="req">*</span> are required. Anything the Reader filled is marked — check it, edit it, it is yours to change.</div>
 
   <div class="field">
-    <label class="label">Property Code <span class="req">*</span></label>
+    <label class="label" for="prop-code">Property Code <span class="req">*</span></label>
     <input class="input" type="text" id="prop-code" placeholder="exactly as in the sheet — e.g. LPWPDMM - 2 BHK - 016">
   </div>
   <div class="field">
-    <label class="label">Location <span class="req">*</span></label>
+    <label class="label" for="f-loc">Location <span class="req">*</span></label>
     <input class="input" type="text" id="f-loc" placeholder="e.g. Mahim W - near Metro">
   </div>
   <div class="grid2">
     <div class="field">
-      <label class="label">Configuration <span class="req">*</span></label>
+      <label class="label" for="f-config">Configuration <span class="req">*</span></label>
       <input class="input" type="text" id="f-config" placeholder="match the tab — e.g. 2 or 2 BHK">
     </div>
     <div class="field">
-      <label class="label">Carpet Area</label>
-      <input class="input" type="text" id="f-area" placeholder="e.g. 580">
+      <label class="label" for="f-area">Carpet Area</label>
+      <input class="input" type="text" id="f-area" placeholder="e.g. 580" inputmode="numeric">
     </div>
   </div>
   <div class="grid2">
     <div class="field">
-      <label class="label">Furnishing</label>
+      <label class="label" for="f-furn">Furnishing</label>
       <input class="input" type="text" id="f-furn" placeholder="e.g. Fully Furnished">
     </div>
     <div class="field">
-      <label class="label">Parking</label>
+      <label class="label" for="f-parking">Parking</label>
       <input class="input" type="text" id="f-parking" placeholder="e.g. 1">
     </div>
   </div>
   <div class="grid2">
     <div class="field">
-      <label class="label">Rent (&#8377;/month) <span class="req">*</span></label>
-      <input class="input" type="text" id="f-rent" placeholder="numbers only — e.g. 135000">
+      <label class="label" for="f-rent">Rent (&#8377;/month) <span class="req">*</span></label>
+      <input class="input" type="text" id="f-rent" placeholder="numbers only — e.g. 135000" inputmode="numeric">
     </div>
     <div class="field">
-      <label class="label">Deposit</label>
+      <label class="label" for="f-deposit">Deposit</label>
       <input class="input" type="text" id="f-deposit" placeholder="e.g. 3 Months">
     </div>
   </div>
   <div class="grid2">
     <div class="field">
-      <label class="label">Pets</label>
+      <label class="label" for="f-pets">Pets</label>
       <input class="input" type="text" id="f-pets" placeholder="e.g. Yes / No">
     </div>
     <div class="field">
-      <label class="label">Tenant Type</label>
+      <label class="label" for="f-tenant">Tenant Type</label>
       <input class="input" type="text" id="f-tenant" placeholder="e.g. All Allowed">
     </div>
   </div>
   <div class="grid2">
     <div class="field">
-      <label class="label">Possession</label>
+      <label class="label" for="f-possession">Possession</label>
       <input class="input" type="text" id="f-possession" placeholder="e.g. Immediate">
     </div>
     <div class="field">
-      <label class="label">Building Name</label>
+      <label class="label" for="f-building">Building Name</label>
       <input class="input" type="text" id="f-building" placeholder="e.g. Prescon Midtown Bay">
     </div>
   </div>
   <div class="field">
-    <label class="label">Notes</label>
+    <label class="label" for="f-notes">Notes</label>
     <textarea class="input" id="f-notes" placeholder="anything worth noting — e.g. sea facing, new building, all amenities"></textarea>
   </div>
   <div class="field">
-    <label class="label">Highlight</label>
+    <label class="label" for="f-highlight">Highlight</label>
     <input class="input" type="text" id="f-highlight" placeholder="short tag shown on the card (optional)">
   </div>
 
-  <div class="field">
+  <div class="field" id="media-section">
     <label class="label">Photos &amp; Video</label>
     <div class="drop-zone" id="drop-zone">
-      <input type="file" id="file-input" accept="image/*,video/*" multiple onchange="handleFiles(this.files)">
-      <div class="dz-icon">📷</div>
-      <div class="dz-title">Drop photos here or tap to select</div>
-      <div class="dz-sub">Photos + video · add photos in viewing order (cover first) · video is placed last</div>
+      <input type="file" id="file-input" accept="image/*,video/*" multiple aria-label="Choose photos and videos">
+      <div class="dz-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M24 31V9m0 0-8 8m8-8 8 8"/><path d="M9 28v7a4 4 0 0 0 4 4h22a4 4 0 0 0 4-4v-7"/></svg></div>
+      <div class="dz-title" id="dz-title">Drag &amp; drop photos and videos here</div>
+      <div class="dz-sub" id="dz-sub">or tap to browse · add photos in viewing order (cover first) · videos always go last</div>
     </div>
+    <div class="media-meta" id="media-meta"></div>
+    <div class="media-label" id="photos-label" style="display:none">Photos · drag to reorder</div>
     <div class="photo-grid" id="photo-grid"></div>
+    <div class="media-label" id="videos-label" style="display:none">Videos</div>
+    <div class="photo-grid" id="video-grid"></div>
     <div class="order-hint" id="order-hint" style="display:none">
-      <strong>Photo order matters.</strong> Position 0 = cover (shown on card). Position 1 = hall/living. Position 2 = bedroom. Position 3 = kitchen. Position 4 = bathroom. Use the ← → buttons to reorder.
+      <strong>Photo order matters.</strong> Position 0 = cover (shown on card). Position 1 = hall/living. Position 2 = bedroom. Position 3 = kitchen. Position 4 = bathroom. <strong>Drag a photo</strong> (or its &#8943; handle on a phone) to a new spot, or tap &#9733; to make it the cover. Videos stay at the end.
     </div>
-    <div id="video-row" style="display:none"></div>
   </div>
 
   <div class="section-head">Internal — clients never see these</div>
   <div class="section-sub">The relay strips these before anything reaches a client. Leave blank if not known.</div>
   <div class="grid2">
     <div class="field">
-      <label class="label">Contact Person</label>
+      <label class="label" for="f-contact">Contact Person</label>
       <input class="input" type="text" id="f-contact" placeholder="owner / broker name">
     </div>
     <div class="field">
-      <label class="label">Number</label>
-      <input class="input" type="text" id="f-number" placeholder="phone">
+      <label class="label" for="f-number">Number</label>
+      <input class="input" type="text" id="f-number" placeholder="phone" inputmode="tel">
     </div>
   </div>
   <div class="grid2">
     <div class="field">
-      <label class="label">Brokerage</label>
+      <label class="label" for="f-brokerage">Brokerage</label>
       <input class="input" type="text" id="f-brokerage" placeholder="e.g. 1 month">
     </div>
     <div class="field">
-      <label class="label">Source / Agent</label>
+      <label class="label" for="f-source">Source / Agent</label>
       <input class="input" type="text" id="f-source" placeholder="where it came from">
     </div>
   </div>
   <div class="field">
-    <label class="label">Inspection Notice</label>
+    <label class="label" for="f-inspection">Inspection Notice</label>
     <input class="input" type="text" id="f-inspection" placeholder="e.g. 24 hours">
-  </div>
-
-  <button class="upload-btn" id="upload-btn" onclick="addListing()">Add Listing &#8594;</button>
-
-  <div class="progress-wrap" id="progress-wrap">
-    <div class="progress-label" id="progress-label">Uploading...</div>
-    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
   </div>
 
   <div class="status" id="status"></div>
@@ -325,126 +429,1539 @@ html,body{min-height:100%;font-family:'Inter',system-ui,sans-serif;background:va
   </div>
 </div>
 
+<!-- STICKY ACTION BAR -->
+<div class="action-bar" id="action-bar">
+  <div class="action-inner">
+    <div class="action-status" id="action-status"></div>
+    <button class="upload-btn" id="upload-btn">Review listing &#8594;</button>
+  </div>
+</div>
+
+<!-- REVIEW SHEET -->
+<div class="sheet-backdrop" id="sheet">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="sheet-head">
+      <div class="sheet-title" id="sheet-title">Review before adding</div>
+      <button type="button" class="sheet-x" id="sheet-x" aria-label="Close">&times;</button>
+    </div>
+    <div class="sheet-body" id="sheet-body"></div>
+    <div class="sheet-foot" id="sheet-foot">
+      <button type="button" class="btn-ghost" id="sheet-back">&#8592; Back to edit</button>
+      <button type="button" class="btn-gold" id="sheet-confirm">Confirm &amp; add listing</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
 <script>
-// ── PASSWORD ──
-// Change this to whatever password you want
-const PASSWORD = 'prithjyo2026';
-const CLOUD = 'dayfllzwe';
-const PRESET = 'prithjyo_listings';
-const ADD_ENDPOINT = '/api/add-listing';
-function val(id){ const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+/* ════════════════════════════════════════════════════════════════
+   PRITHJYO SMART READER — deterministic, runs entirely in the browser.
+   No network calls, no AI guessing: it only reads what the message
+   actually says. Anything unclear is flagged; nothing is invented.
+   ════════════════════════════════════════════════════════════════ */
+const PrithjyoReader = (function () {
+'use strict';
 
-function unlock() {
-  const pw = document.getElementById('lock-pw').value;
-  if (pw === PASSWORD) {
-    document.getElementById('lock').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  } else {
-    document.getElementById('lock-error').textContent = 'Incorrect password.';
-    document.getElementById('lock-pw').value = '';
-    document.getElementById('lock-pw').focus();
+/* ───────────── small helpers ───────────── */
+const SMALL = new Set(['of','and','the','in','at','on','near','opp','by','to']);
+const KEEP_UP = new Set(['CHS','BKC','JVPD','SV','MHADA','SRA','BMC','LBS','AG','RTO','CST','NCPA','MG','BEST','DDA','II','III','IV','VI','JB','BDD','HDIL']);
+function titleCase(s) {
+  return s.replace(/\s+/g, ' ').trim().split(' ').map(function (w, i) {
+    const up = w.toUpperCase();
+    if (KEEP_UP.has(up)) return up;
+    if (/^\d/.test(w)) return w.toLowerCase();
+    const lw = w.toLowerCase();
+    if (i > 0 && SMALL.has(lw)) return lw;
+    return lw.charAt(0).toUpperCase() + lw.slice(1);
+  }).join(' ');
+}
+function smartCase(s) {
+  s = String(s || '').trim();
+  const letters = s.replace(/[^A-Za-z]/g, '');
+  if (!letters) return s;
+  const allUp = letters === letters.toUpperCase();
+  const allLow = letters === letters.toLowerCase();
+  return (allUp || allLow) ? titleCase(s) : s;
+}
+function inr(n) {
+  n = Math.round(n);
+  const s = String(n);
+  if (s.length <= 3) return s;
+  return s.slice(0, -3).replace(/\B(?=(\d{2})+(?!\d))/g, ',') + ',' + s.slice(-3);
+}
+function ordinal(n) {
+  n = parseInt(n, 10);
+  const v = n % 100;
+  if (v >= 11 && v <= 13) return n + 'th';
+  return n + ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
+}
+function uniq(a) { return Array.from(new Set(a)); }
+function cap1(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function oneEdit(a, b) {            // typo test: 1 substitution / 1 transposition / 1 inner insert-delete
+  if (a === b) return false;
+  const la = a.length, lb = b.length;
+  if (Math.abs(la - lb) > 1) return false;
+  if (la === lb) {
+    const d = [];
+    for (let i = 0; i < la; i++) if (a[i] !== b[i]) { d.push(i); if (d.length > 2) return false; }
+    if (d.length === 1) return true;
+    return d.length === 2 && d[1] === d[0] + 1 && a[d[0]] === b[d[1]] && a[d[1]] === b[d[0]];
   }
+  const s = la < lb ? a : b, l = la < lb ? b : a;
+  let i = 0;
+  while (i < s.length && s[i] === l[i]) i++;
+  if (i === s.length) return false;     // extra letter only at the end = plural/suffix, not a typo
+  return s.slice(i) === l.slice(i + 1);
 }
 
-// ── PHOTO MANAGEMENT ──
-let photos = []; // array of File objects in order
-let videoFile = null; // single video, uploaded last
+/* ───────────── cleaning ───────────── */
+const RE_PICTO = /[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}]/gu;
+const RE_EMOJI_ALL = /[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}\u{1F3FB}-\u{1F3FF}\uFE0E\uFE0F\u200D\u20E3]/gu;
+const RE_SYMBOLS = /[\u2190-\u21FF\u2300-\u23FF\u2500-\u25FF\u2600-\u27BF\u2900-\u297F\u2B00-\u2BFF\u00AB\u00BB\u2022\u2023\u3010\u3011\u300A\u300B\u2E3A\uFF5E\u2756\u2735\u2734\u273D\u2605\u2606\u25CF]/g;
+const RE_URL = /\bhttps?:\/\/\S+|\bwww\.\S+|\bwa\.me\/\S+|\bfb\.me\/\S+|\bmaps\.app\.goo\.gl\/\S+|\bgoo\.gl\/\S+|\bbit\.ly\/\S+/gi;
 
-const dropZone = document.getElementById('drop-zone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  handleFiles(e.dataTransfer.files);
-});
+const PROMO = new RegExp('(?:' + [
+  'hot\\s+(?:deal|property|offer|listing)s?', 'best\\s+(?:deal|price|offer)s?', 'hurry(?:\\s+up)?',
+  "don'?t\\s+miss(?:\\s+(?:out|this|it))?", 'grab\\s+(?:it|now|this)(?:\\s+fast)?',
+  'limited\\s+(?:time|period|offer|units?|period\\s+offer)', 'call\\s+(?:me\\s+|us\\s+)?now', 'contact\\s+(?:me\\s+|us\\s+)?(?:now|today|asap)',
+  'dm\\s+(?:me|us)(?:\\s+for\\s+(?:more\\s+)?(?:details|info|information))?', 'dm\\s+for\\s+(?:more\\s+)?(?:details|info|information)',
+  '(?:whatsapp|msg|message|inbox|pm|text)\\s+(?:me|us)(?:\\s+(?:now|today|for\\s+(?:more\\s+)?(?:details|info|information)))?',
+  'for\\s+more\\s+(?:details|info|information)(?:\\s+(?:call|contact|dm|whatsapp))?',
+  'interested\\s+(?:parties|people|clients|persons|tenants)?\\s*(?:please\\s+)?(?:can\\s+)?(?:contact|call|dm|message|whatsapp|inbox)(?:\\s+(?:me|us))?',
+  '(?:serious|genuine)\\s+(?:buyers?|tenants?|clients?|enquir(?:y|ies)|parties)\\s+only',
+  'must\\s+see', 'dream\\s+(?:home|flat|house)', 'once\\s+in\\s+a\\s+lifetime', 'unbeatable', "won'?t\\s+last", 'rare\\s+(?:opportunity|find)',
+  'exclusive\\s+(?:listing|property|offer|deal)', 'please\\s+share', 'share\\s+(?:with|to)\\s+(?:your\\s+)?(?:friends|groups?)',
+  'like\\s*,?\\s*(?:comment|share)', 'follow\\s+(?:us|me)', 'forwarded\\s+as\\s+received', 'brokers?\\s+(?:please\\s+)?excuse', 'no\\s+brokers?\\s+please'
+].join('|') + ')', 'gi');
 
-function handleFiles(files) {
-  const arr = Array.from(files);
-  const imgs = arr.filter(f => f.type.startsWith('image/'));
-  const vids = arr.filter(f => f.type.startsWith('video/'));
-  photos = [...photos, ...imgs];
-  if (vids.length) videoFile = vids[vids.length - 1]; // last video wins if several dropped
-  renderGrid();
-  renderVideo();
-  updateUploadBtn();
-}
+/* obvious misspellings → correct form */
+const TYPO = {
+  furnisehd:'furnished', furnshed:'furnished', furnised:'furnished', furnishd:'furnished', furnsihed:'furnished', furnihed:'furnished', furnshied:'furnished',
+  unfurnshed:'unfurnished', unfurnisehd:'unfurnished', unfurnised:'unfurnished', unfurnishd:'unfurnished', unfurnihsed:'unfurnished',
+  bachelers:'bachelors', bacheler:'bachelor', bachlors:'bachelors', bachlor:'bachelor', baachelor:'bachelor', baachelors:'bachelors',
+  familly:'family', famly:'family', faimly:'family', familiy:'family',
+  avaliable:'available', availble:'available', availabe:'available', availible:'available', avalable:'available', avilable:'available',
+  immediatly:'immediately', imediate:'immediate', immidiate:'immediate', immedeate:'immediate', imidiate:'immediate', imediately:'immediately',
+  depsoit:'deposit', deposite:'deposit', diposit:'deposit', dipost:'deposit', desposit:'deposit',
+  brokrage:'brokerage', brokarage:'brokerage', brokeage:'brokerage', brokerge:'brokerage', brokrege:'brokerage',
+  parkng:'parking', pakring:'parking', parkig:'parking', parkin:'parking',
+  bedrom:'bedroom', bedroon:'bedroom', bedrrom:'bedroom', bedrooom:'bedroom',
+  bathrom:'bathroom', bathroon:'bathroom', bathrooom:'bathroom', bathrrom:'bathroom',
+  kitchan:'kitchen', kichen:'kitchen', kitchn:'kitchen', kithcen:'kitchen',
+  balconey:'balcony', balcny:'balcony', balcany:'balcony', baclony:'balcony',
+  carpert:'carpet', carpate:'carpet', carpat:'carpet',
+  appartment:'apartment', appartments:'apartments', apartmnt:'apartment', aprtment:'apartment', apartmnet:'apartment', apartement:'apartment',
+  renovted:'renovated', renovatd:'renovated', renovetd:'renovated', rennovated:'renovated', renovaed:'renovated',
+  maintainance:'maintenance', maintenence:'maintenance', maintanence:'maintenance', maintaince:'maintenance', maintainence:'maintenance',
+  posession:'possession', possesion:'possession', posssession:'possession', possesssion:'possession',
+  alowed:'allowed', allowd:'allowed', alloed:'allowed', alowwed:'allowed',
+  sqaure:'square', negotable:'negotiable', negotiabel:'negotiable', negociable:'negotiable',
+  fuly:'fully', fulyl:'fully', semmi:'semi', securty:'security', secuirty:'security', locaton:'location', loction:'location',
+  wardrob:'wardrobe', wardrobs:'wardrobes', swiming:'swimming', swimmimg:'swimming', furnitue:'furniture', elevetor:'elevator', gaurd:'guard', gym:'gym'
+};
+const VOCAB = ['furnished','unfurnished','available','immediate','immediately','possession','deposit','security','brokerage','parking','bedroom','bathroom','kitchen','balcony','carpet','apartment','renovated','maintenance','bachelors','bachelor','allowed','negotiable','location','building','wardrobe','family','swimming','amenities','furnishing'];
+const VOCAB_SET = new Set(VOCAB);
+const PROTECT = new Set(['packing','marking','market','parting','barking','carpets','carport','locating','building','buildings','security','location','locations','bachelor','bachelors','family','familys','families','allowed','allowing','furnishing','furnished','amenities','amenity']);
 
-function renderVideo() {
-  const row = document.getElementById('video-row');
-  if (!videoFile) { row.style.display = 'none'; row.innerHTML = ''; return; }
-  row.style.display = 'block';
-  row.innerHTML = '';
-  const tag = document.createElement('div');
-  tag.className = 'video-tag';
-  tag.appendChild(document.createTextNode('🎬  ' + videoFile.name));
-  const rm = document.createElement('button');
-  rm.className = 'video-remove';
-  rm.textContent = 'remove';
-  rm.onclick = () => { videoFile = null; renderVideo(); updateUploadBtn(); };
-  tag.appendChild(rm);
-  row.appendChild(tag);
-}
-
-function removePhoto(idx) {
-  photos.splice(idx, 1);
-  renderGrid();
-  updateUploadBtn();
-}
-
-function movePhoto(idx, dir) {
-  const newIdx = idx + dir;
-  if (newIdx < 0 || newIdx >= photos.length) return;
-  [photos[idx], photos[newIdx]] = [photos[newIdx], photos[idx]];
-  renderGrid();
-}
-
-function renderGrid() {
-  const grid = document.getElementById('photo-grid');
-  const hint = document.getElementById('order-hint');
-  grid.innerHTML = '';
-  if (photos.length === 0) { hint.style.display = 'none'; return; }
-  hint.style.display = 'block';
-
-  photos.forEach((file, i) => {
-    const item = document.createElement('div');
-    item.className = 'photo-item';
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(file);
-    const badge = document.createElement('div');
-    badge.className = 'photo-badge';
-    badge.textContent = i === 0 ? 'Cover' : '#' + i;
-    const rem = document.createElement('button');
-    rem.className = 'photo-remove';
-    rem.innerHTML = '×';
-    rem.onclick = () => removePhoto(i);
-    const orderDiv = document.createElement('div');
-    orderDiv.className = 'photo-order';
-    if (i > 0) {
-      const left = document.createElement('button');
-      left.className = 'order-btn'; left.textContent = '←';
-      left.onclick = () => movePhoto(i, -1);
-      orderDiv.appendChild(left);
+function fixTypos(text, corr) {
+  return text.replace(/[A-Za-z]{5,}/g, function (tok) {
+    const lw = tok.toLowerCase();
+    if (VOCAB_SET.has(lw) || PROTECT.has(lw)) return tok;
+    let fix = TYPO[lw];
+    if (!fix && lw.length >= 6) {
+      for (let i = 0; i < VOCAB.length; i++) { if (oneEdit(lw, VOCAB[i])) { fix = VOCAB[i]; break; } }
     }
-    if (i < photos.length - 1) {
-      const right = document.createElement('button');
-      right.className = 'order-btn'; right.textContent = '→';
-      right.onclick = () => movePhoto(i, 1);
-      orderDiv.appendChild(right);
-    }
-    item.appendChild(img);
-    item.appendChild(badge);
-    item.appendChild(rem);
-    item.appendChild(orderDiv);
-    grid.appendChild(item);
+    if (!fix || fix === lw) return tok;
+    const out = tok === tok.toUpperCase() ? fix.toUpperCase() : (tok.charAt(0) === tok.charAt(0).toUpperCase() ? cap1(fix) : fix);
+    corr.push({ from: tok, to: out });
+    return out;
   });
 }
 
-function updateUploadBtn() { /* button is always enabled now; addListing() validates on submit */ }
-document.getElementById('prop-code').addEventListener('input', updateUploadBtn);
+/* tidy common unit spellings so the extractor sees one form */
+function normalizeUnits(s) {
+  return s
+    .replace(/\b(\d(?:\.\d)?)\s*[-]?\s*(?:b\.?\s?h\.?\s?k\.?|bkh|bhhk|bhkk)\b/gi, '$1 BHK')
+    .replace(/\b(\d)\s*[-]?\s*r\.?\s?k\b/gi, '$1 RK')
+    .replace(/\bsq\.?\s*(?:ft|feet|foot|fts)\.?|\bsqft\b|\bsft\b|\bsq\.?\s*ft\b|\bsquare\s*(?:feet|foot|ft)\b/gi, 'sq ft')
+    .replace(/\bsq\.?\s*(?:m|mtr|mtrs|meters?|metres?)\b|\bsqm\b/gi, 'sq m')
+    .replace(/\b(?:rs|inr)\.?\s*(?=\d)/gi, '₹')
+    .replace(/(\d)\s*\/-/g, '$1')
+    .replace(/\bp\.?\s?c\.?\s?m\b/gi, 'per month');
+}
 
-// ── UPLOAD (direct to Cloudinary, no backend) ──
-function slugCode(code){ return code.trim().replace(/[\/\\]/g,'-').replace(/\s+/g,'-'); }
+/* clean ONE physical line. returns '' for blank, '\u0001' for a hard separator */
+function cleanLine(line, st) {
+  let s = line;
+  const picto = s.match(RE_PICTO); if (picto) st.emoji += picto.length;
+  const hadDeco = /[\p{Extended_Pictographic}\u2500-\u25FF\u2600-\u27BF\u2B00-\u2BFF]/u.test(s) || /[-=_~*.]{3,}/.test(s);
+  s = s.replace(RE_EMOJI_ALL, ' ');
+  const syms = s.match(RE_SYMBOLS); if (syms) st.symbols += syms.length;
+  s = s.replace(RE_SYMBOLS, ' ');
+  const links = s.match(RE_URL); if (links) st.links += links.length;
+  s = s.replace(RE_URL, ' ');
+  s = s.replace(/(\d)\s*\/-/g, '$1');                                             // 85,000/-  →  85,000
+  s = s.replace(/(^|[\s(])#(?:[\p{L}][\p{L}\p{N}_]*|\d+[\p{L}][\p{L}\p{N}_]*)/gu, function (m, a) { st.hashtags++; return a; });
+  s = s.replace(/(^|[\s(])_([^_\n]+)_(?=[\s.,:;!?)]|$)/g, '$1$2');             // _italic_
+  const ast = s.match(/[*~`]/g); if (ast) st.asterisks += ast.length;
+  s = s.replace(/[*~`]/g, '');
+  s = s.replace(/_+/g, ' ');
+  s = s.replace(/^\s*[\-–—•>·]+\s+(?=\S)/, '');                                   // leading bullets
+  s = s.replace(/[.\-=~]{3,}/g, ' ').replace(/\s[-–—]{2,}\s/g, ' ');            // leader runs
+  s = s.replace(/\s+/g, ' ').trim();
+  if (!/[\p{L}\p{N}]/u.test(s)) return hadDeco && line.trim() ? '\u0001' : '';
+  return s;
+}
+
+/* WhatsApp message headers */
+const RE_WA1 = /^[\u200e\u200f]?\[?(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4}),?\s+(\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AaPp]\.?[Mm]\.?)?)\]?\s*[-–]?\s*([^:\n]{1,50}?):\s?(.*)$/;
+const RE_WA2 = /^\[(\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AaPp][Mm])?),?\s+(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4})\]\s*([^:\n]{1,50}?):\s?(.*)$/;
+const RE_WA_NOISE = /^(?:<?(?:media|image|video|sticker|document|audio|gif|contact card|location)\s+omitted>?|this message was deleted\.?|you deleted this message\.?|<this message was edited>|messages and calls are end-to-end encrypted.*|\(file attached\)|forwarded|\[forwarded\]|read more|\.{2,}\s*read more)$/i;
+const RE_FB_NOISE = /^(?:like|comment|share|send|reply|follow|join|see more|see less|see translation|write a comment\.{0,3}|most relevant|top comments|all comments|sponsored|public|friends|only me|shared with .*|all reactions:?|\d+(?:\.\d+)?[km]?\s*(?:likes?|comments?|shares?|reactions?|views?)|\d+(?:\.\d+)?[km]?|·|•|like\s+comment\s+share(?:\s+send)?)$/i;
+const RE_FB_TIME = /^(?:\d{1,2}\s?(?:s|m|min|mins|h|hr|hrs|d|w|wk|y)|just now|yesterday(?:\s+at\s+[\d:]+\s?[ap]m)?|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+\d{1,2}(?:,\s*\d{4})?(?:\s+at\s+[\d:]+\s?[ap]m)?)\s*(?:[·•.]\s*.*)?$/i;
+
+function detectChannel(raw, hint) {
+  if (hint === 'whatsapp' || hint === 'facebook') return hint;
+  const lines = raw.split('\n');
+  let wa = 0, fb = 0;
+  lines.forEach(function (l) {
+    const t = l.trim();
+    if (RE_WA1.test(t) || RE_WA2.test(t)) wa++;
+    if (/<media omitted>|this message was deleted|<this message was edited>/i.test(t)) wa++;
+    if (/^(?:see more|write a comment|all reactions|sponsored|shared with public)\b/i.test(t) || /^like$|^comment$|^share$|^like\s+comment\s+share/i.test(t) || /[·•]\s*follow\b/i.test(t) || /\bfacebook\b/i.test(t)) fb++;
+    if (RE_FB_TIME.test(t) && /[·•]/.test(t)) fb++;
+  });
+  if (wa > 0 && wa >= fb) return 'whatsapp';
+  if (fb > 0) return 'facebook';
+  return 'unknown';
+}
+
+/* split raw text into [{sender, lines[]}] */
+function splitMessages(raw, channel, st) {
+  const lines = raw.split('\n');
+  const msgs = [];
+  let cur = null;
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].trim();
+    let m = RE_WA1.exec(t) || RE_WA2.exec(t);
+    if (m && channel !== 'facebook') {
+      let sender, rest;
+      if (RE_WA1.test(t)) { m = RE_WA1.exec(t); sender = m[3]; rest = m[4]; } else { m = RE_WA2.exec(t); sender = m[3]; rest = m[4]; }
+      sender = sender.replace(/^[~\s\u200e\u200f]+/, '').trim();
+      cur = { sender: sender, lines: [rest] };
+      msgs.push(cur);
+      continue;
+    }
+    if (!cur) { cur = { sender: '', lines: [] }; msgs.push(cur); }
+    cur.lines.push(lines[i]);
+  }
+  return msgs;
+}
+
+/* Facebook: lift poster name + drop chrome */
+function stripFacebook(lines, st) {
+  let sender = '';
+  const out = [];
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].trim();
+    if (!t) { out.push(lines[i]); continue; }
+    if (RE_FB_TIME.test(t) && /[·•]|ago|^\d|yesterday|at\s/i.test(t)) {
+      // previous non-empty line was the poster's name
+      for (let j = out.length - 1; j >= 0; j--) {
+        if (!out[j].trim()) continue;
+        const cand = out[j].trim();
+        if (!sender && cand.length <= 50 && cand.split(/\s+/).length <= 5 && !/\d{3,}/.test(cand)) { sender = cand.replace(/\s*[·•].*$/, ''); out.splice(j, 1); }
+        break;
+      }
+      st.meta++;
+      continue;
+    }
+    if (RE_FB_NOISE.test(t) || /^[·•]\s*(?:follow|join)$/i.test(t)) { st.meta++; continue; }
+    out.push(lines[i].replace(/\s*[·•]\s*(?:follow|join)\b.*$/i, ''));
+  }
+  return { lines: out, sender: sender };
+}
+
+/* ───────────── phones ───────────── */
+const RE_PHONE = /(?<![\d])(?:\+?\s*91[\s\-.]*|0)?(?:\d[\s\-.]?){9}\d(?![\d])/g;
+function findPhones(text) {
+  const out = [];
+  let m;
+  RE_PHONE.lastIndex = 0;
+  while ((m = RE_PHONE.exec(text))) {
+    let d = m[0].replace(/\D/g, '');
+    if (d.length === 12 && d.indexOf('91') === 0) d = d.slice(2);
+    else if (d.length === 11 && d[0] === '0') d = d.slice(1);
+    if (/^[6-9]\d{9}$/.test(d)) out.push({ digits: d, idx: m.index, len: m[0].length, kind: 'mobile' });
+    else if (/^22\d{8}$/.test(d)) out.push({ digits: d, idx: m.index, len: m[0].length, kind: 'landline' });
+  }
+  return out;
+}
+function fmtPhone(p) { return p.kind === 'landline' ? '022 ' + p.digits.slice(2, 6) + ' ' + p.digits.slice(6) : p.digits.slice(0, 5) + ' ' + p.digits.slice(5); }
+function blankPhones(text) {
+  const ph = findPhones(text);
+  let out = text;
+  ph.slice().sort(function (a, b) { return b.idx - a.idx; }).forEach(function (p) { out = out.slice(0, p.idx) + ' '.repeat(p.len) + out.slice(p.idx + p.len); });
+  return out;
+}
+
+/* ───────────── locality dictionary ───────────── */
+const DIR_BASES = ['Bandra','Khar','Santacruz','Vile Parle','Andheri','Jogeshwari','Goregaon','Malad','Kandivali','Borivali','Dahisar','Mulund','Bhandup','Kurla','Ghatkopar','Vikhroli','Dadar','Matunga','Mahim','Sion','Thane','Mira Road','Bhayandar','Kalina','Wadala','Parel','Lower Parel','Chembur','Powai','Dombivli','Kalyan','Vashi','Nerul','Kharghar','Vasai','Virar'];
+const PLAIN_LOC = ['Colaba','Cuffe Parade','Nariman Point','Fort','Churchgate','Marine Lines','Marine Drive','Malabar Hill','Breach Candy','Cumballa Hill','Pedder Road','Walkeshwar','Tardeo','Grant Road','Girgaon','Girgaum','Mumbai Central','Byculla','Mahalaxmi','Worli','Prabhadevi','Juhu','Versova','Oshiwara','BKC','Bandra Kurla Complex','Kemps Corner','Altamount Road','Napean Sea Road','Opera House','Gamdevi','Lalbaug','Currey Road','Chinchpokli','Mazgaon','Dongri','Sewri','Antop Hill','Govandi','Mankhurd','Trombay','Navi Mumbai','Panvel','Airoli','Belapur','Ulwe','Dharavi','Kala Ghoda','Apollo Bunder','Nepean Sea Road','Carmichael Road','Hughes Road','August Kranti Marg','Haji Ali','Mahim Causeway'];
+const MICRO_LOC = ['Lokhandwala','Pali Hill','Pali Naka','Carter Road','Linking Road','Hill Road','Turner Road','Union Park','Chuim','Bandstand','Bandra Reclamation','Reclamation','Waroda Road','Perry Cross Road','Perry Road','Khar Danda','Danda','Juhu Tara Road','JVPD','Gulmohar Road','Seven Bungalows','Four Bungalows','Yari Road','SV Road','Link Road','Veera Desai Road','Lokhandwala Complex','Hiranandani Gardens','Pali Market','Ranwar','Chapel Road','St Andrews Road','Mount Mary','Bandra Station','Lilavati','Almeida Park','Chimbai','Kherwadi','Gazdar Bandh','Gazdarbandh','Nargis Dutt Road','Union Park Road','19th Road','16th Road','14th Road','17th Road','24th Road','33rd Road','30th Road','10th Road','12th Road','15th Road','18th Road','20th Road','21st Road','23rd Road','26th Road','27th Road','28th Road','29th Road','31st Road','32nd Road','Juhu Scheme','Juhu Beach'];
+const LOC_ENTRIES = (function () {
+  const all = [];
+  DIR_BASES.forEach(function (n) { all.push({ name: n, dir: true, type: 'loc' }); });
+  PLAIN_LOC.forEach(function (n) { all.push({ name: n, dir: false, type: 'loc' }); });
+  MICRO_LOC.forEach(function (n) { all.push({ name: n, dir: false, type: 'micro' }); });
+  all.sort(function (a, b) { return b.name.length - a.name.length; });
+  return all;
+})();
+const CANON = { 'Girgaum':'Girgaon', 'Gazdarbandh':'Gazdar Bandh', 'Nepean Sea Road':'Napean Sea Road', 'Bandra Kurla Complex':'BKC' };
+const LANDMARK_BEFORE = /(?:near|opp(?:osite|\.)?|behind|next\s+to|adjacent\s+to|walking\s+distance\s+(?:from|to)|close\s+to|from|towards?|via|off)\s+(?:the\s+)?$/i;
+
+function findLocalities(text) {
+  const taken = [];     // consumed ranges
+  const hits = [];
+  LOC_ENTRIES.forEach(function (e) {
+    const esc = e.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, '\\s+');
+    const re = new RegExp('(?<![A-Za-z])' + esc + '(?![A-Za-z])' + (e.dir ? '(?:\\s*[\\(\\-,/.]?\\s*(west|east|w|e)(?![\\w\\/])\\)?)?' : ''), 'gi');
+    let m;
+    while ((m = re.exec(text))) {
+      const start = m.index, end = m.index + m[0].length;
+      if (taken.some(function (r) { return start < r[1] && end > r[0]; })) continue;
+      taken.push([start, end]);
+      let dir = '';
+      if (e.dir && m[1]) dir = /^w/i.test(m[1]) ? 'West' : 'East';
+      const before = text.slice(Math.max(0, start - 24), start);
+      hits.push({ name: CANON[e.name] || e.name, dir: dir, type: e.type, idx: start, landmark: LANDMARK_BEFORE.test(before) });
+    }
+  });
+  hits.sort(function (a, b) { return a.idx - b.idx; });
+  return hits;
+}
+
+/* ───────────── amount reading ───────────── */
+const NUM = '\\d{1,3}(?:,\\d{2,3})+(?:\\.\\d+)?|\\d+(?:\\.\\d+)?';
+const KW = {
+  deposit:   /(?:security\s*deposit|deposit|depo\b|dep\b|security|advance|caution\s*money)/gi,
+  brokerage: /(?:brokerage|brkg|bkg|commission|broker)/gi,
+  maint:     /(?:maintenance|maint\b|mnt\b|society\s*charges?|outgoings?|association|cam\b)/gi,
+  rent:      /(?:rent|rental|kiraya|kiraye|bhada|bhade|monthly|per\s*month|\/\s*month|\bpm\b|p\.m\.?|asking|price|quote|budget|expected|ask\b|@)/gi,
+  sale:      /(?:for\s*sale|sale\s*price|selling|resale|outright|sell\b)/gi
+};
+function amountsIn(text) {
+  const out = [];
+  const re = new RegExp('(₹)?\\s*(' + NUM + ')\\s*(k|thousand|lakhs?|lacs?|lacks?|l|crores?|cr)?(?![a-z0-9])', 'gi');
+  text.split('\n').forEach(function (line) {
+    const list = [];
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(line))) {
+      if (!m[2]) { re.lastIndex++; continue; }
+      const unit = (m[3] || '').toLowerCase();
+      let v = parseFloat(m[2].replace(/,/g, ''));
+      if (isNaN(v)) continue;
+      if (unit === 'k' || unit === 'thousand') v *= 1e3;
+      else if (/^l/.test(unit)) v *= 1e5;
+      else if (/^c/.test(unit)) v *= 1e7;
+      const numStart = m.index + m[0].indexOf(m[2]);
+      const a = { v: Math.round(v), rawNum: m[2], unit: unit, marker: !!(m[1] || unit), start: numStart, end: m.index + m[0].length, kind: 'unk', kwText: '' };
+      a.kind = baseKind(a, line);
+      list.push(a);
+    }
+    // assign each label word to its nearest amount (one label ↔ one amount)
+    const kws = [];
+    Object.keys(KW).forEach(function (k) {
+      const r = new RegExp(KW[k].source, 'gi');
+      let x;
+      while ((x = r.exec(line))) kws.push({ k: k, start: x.index, end: x.index + x[0].length, text: x[0] });
+    });
+    kws.sort(function (a, b) { return a.start - b.start; });
+    // is the line written label-first ("Rent 85k Deposit 5L") or amount-first ("85k rent 5L deposit")?
+    let lf = 0, af = 0;
+    kws.forEach(function (kw) {
+      if (/^[\s:\-–=@₹.]*\d/.test(line.slice(kw.end))) lf++;
+      if (/\d[\d,.]*\s*(?:k|l|lakhs?|lacs?|cr|thousand)?\s*[\/\-–:]?\s*$/i.test(line.slice(0, kw.start))) af++;
+    });
+    const style = af > lf ? 'after' : 'before';
+    kws.forEach(function (kw) {
+      // a label whose own value is a count ("deposit 3 months") never borrows a neighbouring amount
+      const sep = /^[\s:\-–=@₹.]*/.exec(line.slice(kw.end))[0].length;
+      if (list.some(function (a) { return a.start === kw.end + sep && a.kind === 'count'; })) return;
+      let best = null;
+      list.forEach(function (a) {
+        if (a.kind !== 'unk') return;
+        let d, side;
+        if (kw.end <= a.start) { d = a.start - kw.end; side = 'before'; if (d > 30) return; }
+        else if (kw.start >= a.end) { d = kw.start - a.end; side = 'after'; if (d > 18) return; }
+        else return;
+        if (!best || d < best.d || (d === best.d && side === style)) best = { a: a, d: d, side: side };
+      });
+      if (best && (!best.a.kw || best.d < best.a.kw.d || (best.d === best.a.kw.d && best.side === style))) best.a.kw = { k: kw.k, d: best.d, text: kw.text };
+    });
+    list.forEach(function (a) { if (a.kind === 'unk' && a.kw) { a.kind = a.kw.k; a.kwText = a.kw.text; } out.push(a); });
+  });
+  return out;
+}
+function baseKind(a, line) {
+  const after = line.slice(a.end, a.end + 14);
+  if (/^\s*(?:\/\s*sq|psf|per\s+sq)/i.test(after)) return 'rate';
+  if (/^\s*(?:sq\s?ft|sq\s?m|sq\.?\s?yd|sq\b|%)/i.test(after)) return 'area';
+  if (!a.marker && /^\s*(?:bhk|rk|bath|bed|floor|th\b|st\b|nd\b|rd\b|car\b|cars\b|parking|month|mth|mo\b|mn\b|day|yr|year|hr|hour|people|person|member|storey|story|wheel|seater|cp\b|rooms?|k\b)/i.test(after)) return 'count';
+  if (/^\s*(?:bhk|rk)\b/i.test(after)) return 'count';
+  if (/floor\s*$/i.test(line.slice(Math.max(0, a.start - 8), a.start))) return 'count';
+  return 'unk';
+}
+
+/* ───────────── field extractors ───────────── */
+function extractFields(text, ctx) {
+  const fields = {};          // key → {value, conf, note}
+  const conflicts = {};       // key → {options, note}
+  const flags = [];           // {level, field, msg}
+  const leftOut = [];         // things deliberately not saved
+  const T = text;
+  const lines = T.split('\n').filter(function (l) { return l.trim(); });
+  const phones = findPhones(T);
+  const Tn = blankPhones(T);              // text with phone numbers blanked (safe for number reading)
+  const low = Tn.toLowerCase();
+  const amts = amountsIn(Tn);
+
+  function set(key, value, conf, note) { fields[key] = { value: value, conf: conf || 'high', note: note || '' }; }
+  function conflict(key, options, note) { conflicts[key] = { options: uniq(options), note: note || '' }; }
+  function flag(level, field, msg) { flags.push({ level: level, field: field || '', msg: msg }); }
+
+  /* ── what kind of message is this? ── */
+  const head = low.slice(0, 120);
+  let kind = 'listing';
+  const supplyWords = /\b(available|for\s+rent|to\s+let|on\s+rent|on\s+lease|for\s+lease|vacant|offering|leave\s*(?:and|&)\s*license|l\s*&\s*l|ready\s+to\s+move|immediate)\b/i;
+  if (/\b(required|requirement|reqd|looking\s+for|wanted|need(?:ed)?|searching\s+for|client\s+(?:requires?|looking|wants?|needs?)|urgent(?:ly)?\s+(?:required|need|looking))\b/i.test(head) && !supplyWords.test(head.slice(0, head.search(/\b(required|requirement|reqd|looking\s+for|wanted|need|searching|client)/i) + 1)) && /\b(budget|upto|up\s+to|max)\b/i.test(low)) kind = 'requirement';
+  const saleish = /\b(for\s+sale|sale\s+price|selling|resale|outright|sell\b|on\s+sale)\b/i.test(low);
+  const rentish = /\b(rent|rental|lease|license|l\s*&\s*l|kiraya|kiraye|bhada|to\s+let|per\s+month|pm\b|monthly)\b/i.test(low);
+  const croreAmt = amts.some(function (a) { return /^c/.test(a.unit) && a.v >= 5e6; });
+  const isSale = (saleish && !rentish) || (croreAmt && !rentish);
+
+  /* ── occupancy / flatmate listings ── */
+  const occRe = /\b(single\s+occupancy|double\s+occupancy|triple\s+occupancy|flat\s*mates?|room\s*mates?|room\s+sharing|sharing\s+basis|shared\s+room|paying\s+guest|(?:boys|girls|gents|ladies)\s+pg|\bpg\b|(?:one|1)\s+room\s+available|room\s+available|bed\s+available|co-?living|per\s+(?:bed|person|head))\b/i;
+  const occupancy = occRe.test(low);
+
+  /* ── CONFIG ── */
+  (function () {
+    const found = [];
+    let m;
+    const re1 = /\b(\d(?:\.\d)?)\s*bhk\b/gi;
+    while ((m = re1.exec(Tn))) found.push(m[1] + ' BHK');
+    const re2 = /\b(\d)\s*rk\b/gi;
+    while ((m = re2.exec(Tn))) found.push(m[1] + ' RK');
+    const re3 = /\b(\d)\s*[-]?\s*(?:bed\s?rooms?|beds?|br|bdr)\b/gi;
+    let weak = false;
+    if (!found.length) { while ((m = re3.exec(Tn))) { found.push(m[1] + ' BHK'); weak = true; } }
+    const wordNum = { one: 1, two: 2, three: 3, four: 4, five: 5 };
+    if (!found.length) {
+      const re4 = /\b(one|two|three|four|five)\s*[-]?\s*(?:bed\s?rooms?|bhk|bedroom)\b/gi;
+      while ((m = re4.exec(Tn))) { found.push(wordNum[m[1].toLowerCase()] + ' BHK'); weak = true; }
+    }
+    if (!found.length && /\bstudio\s*(?:apartment|apt|flat|unit)\b|\bstudio\b(?=\s*(?:on\s+rent|for\s+rent|available|,|\.|$))/i.test(Tn) && !/\bstudios\b/i.test(Tn)) {
+      found.push('Studio'); weak = true;
+    }
+    const u = uniq(found);
+    if (u.length === 1) set('config', u[0], weak ? 'med' : 'high', weak ? 'Inferred from "' + (u[0] === 'Studio' ? 'studio' : 'bedroom') + '" wording — confirm' : '');
+    else if (u.length > 1) conflict('config', u, 'More than one configuration in this message');
+    if (/\bsharing\b/i.test(Tn) === false && /\bduplex\b/i.test(Tn)) { /* note added later */ }
+  })();
+
+  /* ── AREA ── */
+  (function () {
+    const cands = [];
+    const built = [];
+    let m;
+    const reLab = /carpet(?:[ \t]*area)?[ \t]*[:\-–=]?[ \t]*(?<![₹])(\d[\d,]*(?:\.\d+)?)(?![\d,]*\s*(?:k\b|lakh|lac|l\b))[ \t]*(sq ft|sq m|sq\.?\s?yd)?/gi;
+    while ((m = reLab.exec(Tn))) cands.push({ v: parseFloat(m[1].replace(/,/g, '')), unit: m[2] || 'sq ft', labelled: true });
+    const reRev = /(?<![₹\d,.])(\d[\d,]*(?:\.\d+)?)[ \t]*(sq ft|sq m)?[ \t]*\(?[ \t]*carpet/gi;
+    while ((m = reRev.exec(Tn))) cands.push({ v: parseFloat(m[1].replace(/,/g, '')), unit: m[2] || 'sq ft', labelled: true });
+    const reBu = /(?:built[\s-]?up|b\.?u\.?a\.?|saleable|super\s*built[\s-]?up)(?:\s*area)?\s*[:\-–=]?\s*(\d[\d,]*(?:\.\d+)?)\s*(sq ft|sq m)?|(\d[\d,]*(?:\.\d+)?)\s*(sq ft|sq m)?\s*(?:\(?\s*)(?:built[\s-]?up|b\.?u\.?a\.?|saleable)/gi;
+    while ((m = reBu.exec(Tn))) built.push(parseFloat((m[1] || m[3]).replace(/,/g, '')));
+    let weak = false;
+    if (!cands.length) {
+      const reAny = /(?<![₹\d.,])(\d[\d,]*(?:\.\d+)?)\s*(sq ft|sq m)\b(?!\s*(?:\/|rate|psf))/gi;
+      while ((m = reAny.exec(Tn))) {
+        const v = parseFloat(m[1].replace(/,/g, ''));
+        if (built.indexOf(v) >= 0) continue;
+        const pre = Tn.slice(Math.max(0, m.index - 20), m.index).toLowerCase();
+        if (/(?:₹|rs\.?|rate|@|per)\s*$/.test(pre)) continue;
+        cands.push({ v: v, unit: m[2], labelled: false }); weak = true;
+      }
+    }
+    const vals = [];
+    cands.forEach(function (c) {
+      let v = c.v, conv = false;
+      if (c.unit === 'sq m') { v = v * 10.7639; conv = true; }
+      else if (/yd/.test(c.unit)) { v = v * 9; conv = true; }
+      vals.push({ v: Math.round(v), conv: conv, labelled: c.labelled });
+    });
+    const distinct = uniq(vals.map(function (x) { return x.v; }));
+    if (distinct.length === 1) {
+      const x = vals[0];
+      if (x.v < 80 || x.v > 15000) { flag('amber', 'area', 'Area "' + x.v + '" looks unusual — check the number'); }
+      set('area', String(x.v), (!weak && !x.conv) ? 'high' : 'med',
+        x.conv ? 'Converted to sq ft from the unit in the message' : (weak ? 'Area is not labelled "carpet" in the message — confirm it is carpet' : ''));
+    } else if (distinct.length > 1) {
+      conflict('area', distinct.map(String), 'Different carpet areas in the message');
+    } else if (built.length) {
+      flag('amber', 'area', 'Only a built-up/saleable area is given (' + uniq(built).join(' / ') + ' sq ft) — carpet area not stated, left blank');
+    }
+  })();
+
+  /* ── RENT (and sale detection) ── */
+  (function () {
+    // ranges like "85-90k"
+    const rangeRe = /(\d[\d,.]*)\s*(k|l|lakhs?|lacs?)?\s*(?:-|–|to)\s*(\d[\d,.]*)\s*(k|l|lakhs?|lacs?)\b/i;
+    const rentLines = [];
+    amts.forEach(function (a) { if (a.kind === 'rent') rentLines.push(a); });
+    const mult = function (u) { u = (u || '').toLowerCase(); return u === 'k' ? 1e3 : (/^l/.test(u) ? 1e5 : 1); };
+    const plausible = function (v) { return v >= 3000 && v <= 2000000; };
+    // a range such as "70-75k" is never silently collapsed to one number
+    const rtxt = Tn.split('\n').filter(function (l) { return /rent|rental|price|budget|asking|kiraya|₹|\bk\b|lakh|lac|\d\s*l\b/i.test(l); }).join('\n');
+    const rg = rangeRe.exec(rtxt);
+    let rangeVals = null;
+    if (rg) {
+      const secondAmt = amts.filter(function (a) { return a.rawNum === rg[3] && a.unit; })[0];
+      if (!secondAmt || secondAmt.kind === 'rent' || secondAmt.kind === 'unk') {
+        const u1 = rg[2] || rg[4], u2 = rg[4];
+        const x1 = parseFloat(rg[1].replace(/,/g, '')) * mult(u1), x2 = parseFloat(rg[3].replace(/,/g, '')) * mult(u2);
+        if (plausible(x1) && plausible(x2) && x1 !== x2) rangeVals = [Math.round(x1), Math.round(x2)];
+      }
+    }
+    if (rangeVals) { conflict('rent', rangeVals.map(String), 'A rent range is given — pick the actual rent'); return; }
+    const lab = rentLines.filter(function (a) { return plausible(a.v); });
+    const unclear = rentLines.filter(function (a) { return !plausible(a.v) && !a.marker && a.v < 1000 && /rent|rental|price|asking|kiraya|bhada|budget/i.test(a.kwText); });
+    const unl = amts.filter(function (a) { return a.kind === 'unk' && a.marker && plausible(a.v) && !/^c/.test(a.unit); });
+    if (isSale && kind !== 'requirement') {
+      flag('red', 'rent', 'This reads like a SALE listing, not a rental — rent left blank');
+      return;
+    }
+    let vals = uniq(lab.map(function (a) { return a.v; }));
+    if (vals.length === 1) { set('rent', String(vals[0]), 'high'); return; }
+    if (vals.length > 1) { conflict('rent', vals.map(String), 'Different rent figures in the message'); return; }
+    const uv = uniq(unl.map(function (a) { return a.v; }));
+    if (uv.length === 1) { set('rent', String(uv[0]), 'med', 'The amount is not labelled "rent" in the message — confirm'); return; }
+    if (uv.length > 1) { conflict('rent', uv.map(String), 'Several amounts and none labelled as rent'); return; }
+    if (unclear.length) flag('amber', 'rent', 'Rent given as "' + unclear[0].rawNum + '" with no unit (k / lakh) — left blank');
+  })();
+
+  /* ── DEPOSIT ── */
+  (function () {
+    const months = [];
+    let m;
+    const KWD = '(?:security\\s*deposit|deposit|depo|dep|security|advance|caution\\s*money)';
+    const r1 = new RegExp(KWD + '\\s*(?:of|is|:|-|–|=|@)?\\s*(?:₹\\s*)?(\\d+(?:\\.\\d+)?)\\s*(?:months?|mths?|mos?|mn|mahine|mahina|mahinay|mahinon)\\b', 'gi');
+    const r2 = new RegExp('(\\d+(?:\\.\\d+)?)\\s*(?:months?|mths?|mos?|mn|mahine|mahina|mahinay|mahinon)\\s*(?:of\\s*)?(?:rent\\s*)?(?:as\\s*)?' + KWD, 'gi');
+    while ((m = r1.exec(Tn))) months.push(parseFloat(m[1]));
+    while ((m = r2.exec(Tn))) months.push(parseFloat(m[1]));
+    const extraAmts = [];
+    const AMTX = '(₹?\\s*' + NUM + '\\s*(?:k|l|lakhs?|lacs?)?)';
+    // "deposit ₹5,40,000 (6 months)"  → months AND amount
+    const r4 = new RegExp(KWD + '\\s*[:\\-–=]?\\s*' + AMTX + '\\s*[\\(\\-–=,]*\\s*(\\d+(?:\\.\\d+)?)\\s*(?:months?|mths?|mahine|mahina)\\b', 'gi');
+    while ((m = r4.exec(Tn))) { const am = amountsIn(m[1])[0]; if (am && (am.marker || am.v >= 20000)) { extraAmts.push(am.v); months.push(parseFloat(m[2])); } }
+    // "deposit 4 months (₹5,00,000)"  → months AND amount
+    const r5 = new RegExp(KWD + '\\s*[:\\-–=]?\\s*\\d+(?:\\.\\d+)?\\s*(?:months?|mths?|mahine|mahina)\\s*[\\(\\-–=,]*\\s*' + AMTX, 'gi');
+    while ((m = r5.exec(Tn))) { const am = amountsIn(m[1])[0]; if (am && (am.marker || am.v >= 20000)) extraAmts.push(am.v); }
+    const dm = uniq(months);
+    const damts = amts.filter(function (a) { return a.kind === 'deposit' && a.v >= 5000 && (a.marker || a.v >= 20000); });
+    const dv = uniq(damts.map(function (a) { return a.v; }).concat(extraAmts));
+    const none = /\b(?:no|zero|nil)\s+(?:security\s+)?deposit\b/i.test(Tn);
+    const fmtM = function (n) { return n + (n === 1 ? ' Month' : ' Months'); };
+    if (none && !dm.length && !dv.length) { set('deposit', 'None', 'high'); return; }
+    if (dm.length > 1) { conflict('deposit', dm.map(fmtM), 'Different deposit durations in the message'); return; }
+    if (dm.length === 1) {
+      set('deposit', fmtM(dm[0]), 'high');
+      if (dv.length === 1 && fields.rent) {
+        const exp = dm[0] * parseFloat(fields.rent.value);
+        if (Math.abs(exp - dv[0]) / exp > 0.02) flag('amber', 'deposit', 'Deposit is given as ' + fmtM(dm[0]) + ' (₹' + inr(exp) + ' at this rent) and also as ₹' + inr(dv[0]) + ' — these disagree');
+      }
+      return;
+    }
+    if (dv.length === 1) { set('deposit', '₹' + inr(dv[0]), 'med', 'Deposit is an amount; the sheet usually records months — confirm'); return; }
+    if (dv.length > 1) { conflict('deposit', dv.map(function (v) { return '₹' + inr(v); }), 'Different deposit amounts in the message'); }
+  })();
+
+  /* ── FURNISHING ── */
+  (function () {
+    const t = Tn;
+    const hasUn = /\b(?:unfurnished|un-?furnished|non[\s-]?furnished|bare\s*shell|without\s+furniture|empty\s+flat)\b/i.test(t);
+    const hasSemi = /\b(?:semi[\s-]?furnished|partly\s+furnished|part\s+furnished|partially\s+furnished|semi\s*furn\b|s\/f\b)\b/i.test(t);
+    const hasFull = /\b(?:fully[\s-]?furnished|full[\s-]?furnished|fully\s*furn\b|f\/f\b|completely\s+furnished|luxuriously\s+furnished|ready\s+furnished|fully\s+loaded)\b/i.test(t);
+    const bare = !hasUn && !hasSemi && !hasFull && /\bfurnished\b/i.test(t.replace(/\b(?:un|semi|fully|partly)[\s-]?furnished\b/gi, ''));
+    const got = [];
+    if (hasUn) got.push('Unfurnished');
+    if (hasSemi) got.push('Semi Furnished');
+    if (hasFull) got.push('Fully Furnished');
+    if (got.length === 1) set('furn', got[0], 'high');
+    else if (got.length > 1) conflict('furn', got, 'Message mentions more than one furnishing level');
+    else if (bare) set('furn', 'Fully Furnished', 'med', 'Message only says "furnished" — confirm Fully vs Semi');
+  })();
+
+  /* ── PARKING ── */
+  (function () {
+    const wordNum = { one: 1, two: 2, three: 3, four: 4, a: 1 };
+    const nums = [];
+    let m;
+    const r1 = /(\d+|one|two|three|four)\s*(?:covered\s*|open\s*|reserved\s*|dedicated\s*|allotted\s*|car\s*|four[\s-]wheeler\s*)*(?:car\s*)?(?:parking|park\b|cp\b)/gi;
+    while ((m = r1.exec(Tn))) nums.push(wordNum[m[1].toLowerCase()] || parseInt(m[1], 10));
+    const r2 = /parking\s*[:\-–=]?\s*(\d+)\b(?!\s*(?:sq|k\b|,))/gi;
+    while ((m = r2.exec(Tn))) nums.push(parseInt(m[1], 10));
+    const none = /\b(?:no|nil|without)\s+(?:car\s+)?parking\b|\bparking\s*[:\-–]\s*(?:no|nil|none|na|n\/a)\b/i.test(Tn);
+    const good = uniq(nums.filter(function (n) { return n >= 0 && n <= 10; }));
+    if (none && !good.length) set('parking', '0', 'high');
+    else if (good.length === 1) set('parking', String(good[0]), 'high');
+    else if (good.length > 1) conflict('parking', good.map(String), 'Different parking counts in the message');
+    else if (/\bparking\b/i.test(Tn) && !/\bno\s+parking\b/i.test(Tn)) flag('info', 'parking', 'Parking is mentioned but the number of spots is not — left blank');
+  })();
+
+  /* ── PETS ── */
+  (function () {
+    const yes = /\bpets?\s*(?:are\s+)?(?:allowed|ok|okay|welcome|accepted|friendly|permitted)\b|\bpet[\s-]friendly\b|\bpets?\s*[:\-–]\s*(?:yes|allowed|ok)\b/i.test(Tn);
+    const no = /\bno\s+pets?\b|\bpets?\s*(?:are\s+)?(?:not\s+allowed|not\s+permitted|not\s+accepted|prohibited)\b|\bpets?\s*[:\-–]?\s*(?:no|not\s+allowed|nil|nahi)\b|\bpet\s+not\s+allowed\b/i.test(Tn);
+    if (yes && no) conflict('pets', ['Yes', 'No'], 'Message says pets are both allowed and not allowed');
+    else if (yes) set('pets', 'Yes', 'high');
+    else if (no) set('pets', 'No', 'high');
+  })();
+
+  /* ── TENANT TYPE ── */
+  let vegOnly = false, vegWord = '';
+  (function () {
+    const t = Tn;
+    const all = /\b(?:all\s+(?:tenants?\s+)?(?:are\s+)?(?:allowed|welcome|ok)|anyone\s+(?:is\s+)?(?:allowed|welcome|ok)|open\s+to\s+all|any\s+tenants?|family\s*(?:,|\/|&|or|and)\s*(?:bachelors?|singles?)|(?:bachelors?|singles?)\s*(?:,|\/|&|or|and)\s*family|no\s+restrictions?\s+on\s+tenants?)\b/i.test(t);
+    const famOnly = /\b(?:family\s+only|only\s+famil(?:y|ies)|families\s+only|for\s+family\s+only|family\s+tenants?\s+only)\b/i.test(t);
+    const famPrefer = /\b(?:family\s+(?:preferred|preferable)|prefer(?:ably)?\s+(?:a\s+)?famil(?:y|ies)|preferably\s+family)\b/i.test(t);
+    const famWeak = !famOnly && !famPrefer && /\bfamil(?:y|ies)\s+(?:welcome|ok|okay|allowed)\b/i.test(t);
+    const nobach = /\bno\s+(?:bachelors?|singles?)\b|\bbachelors?\s+(?:not\s+allowed|not\s+accepted|not\s+permitted)\b|\bwithout\s+bachelors?\b/i.test(t);
+    const bach = !nobach && /\bbachelors?\s*(?:are\s+)?(?:allowed|ok|okay|welcome|accepted|permitted)\b|\b(?:allowed|welcome)\s+(?:for\s+)?bachelors?\b|\bbachelors?\s+(?:friendly|also)\b/i.test(t);
+    const company = /\b(?:company\s+lease|corporate\s+lease|company\s+(?:tenant|accommodation)|corporate\s+(?:tenant|housing))\b/i.test(t);
+    const girls = /\b(?:girls|ladies|female|women|working\s+women)\s+(?:only|preferred)\b|\bonly\s+(?:girls|ladies|female|women)\b|\b(?:girls|ladies)\s+pg\b/i.test(t);
+    const boys = /\b(?:boys|gents|male|men)\s+(?:only|preferred)\b|\bonly\s+(?:boys|gents|male|men)\b|\b(?:boys|gents)\s+pg\b/i.test(t);
+    const prof = /\bworking\s+professionals?\b/i.test(t);
+    const lbl = /\btenants?\s*(?:type|preference|pref|preferred)?\s*[:\-–=]\s*(family|families|bachelors?|singles?|any(?:one)?|all|open\s+to\s+all|company|corporate)\b/i.exec(t);
+    vegOnly = /\b(?:veg(?:etarian)?s?\s+only|only\s+veg(?:etarian)?s?|strictly\s+veg(?:etarian)?|no\s+non[\s-]?veg(?:etarian)?)\b/i.test(t);
+    if (!vegOnly) {
+      const vw = /\b(pure\s+veg(?:etarian)?|veg(?:etarian)?\s+(?:preferred|preferable)|prefer(?:ably)?\s+veg(?:etarian)?|veg(?:etarian)?\s+(?:family|tenants?|society|building))\b/i.exec(t);
+      if (vw) vegWord = /prefer/i.test(vw[1]) ? 'Vegetarian preferred' : (/pure/i.test(vw[1]) ? 'Pure veg' : cap1(vw[1].toLowerCase()));
+    }
+    let val = null, conf = 'high', note = '';
+    const opts = [];
+    if (girls && !boys) val = 'Girls Only';
+    else if (boys && !girls) val = 'Boys Only';
+    else if (famOnly) {
+      if (company) val = 'Family / Company';
+      else if (bach || all) opts.push('Family Only', all ? 'All Allowed' : 'Bachelors Allowed');
+      else val = 'Family Only';
+    } else if (famPrefer || famWeak) {
+      if (bach || all) { val = 'All Allowed'; note = 'The message prefers families but also allows others'; conf = 'med'; }
+      else if (company) val = 'Family / Company';
+      else { val = 'Family Preferred'; if (famWeak) { conf = 'med'; note = 'The message only says families are welcome — confirm'; } }
+    } else if (all) val = 'All Allowed';
+    else if (bach) val = 'Bachelors Allowed';
+    else if (company) val = 'Company Lease';
+    else if (nobach) val = 'No Bachelors';
+    else if (lbl) {
+      const w = lbl[1].toLowerCase();
+      if (/^(?:any|all|open)/.test(w)) val = 'All Allowed';
+      else if (/^famil/.test(w)) { val = 'Family Only'; conf = 'med'; note = 'Stated as "Tenant: Family" — confirm Family Only vs Family Preferred'; }
+      else if (/^(?:bachelor|single)/.test(w)) { val = 'Bachelors Allowed'; conf = 'med'; note = 'Stated as "Tenant: Bachelors" — confirm'; }
+      else val = 'Company Lease';
+    } else if (prof) { val = 'Working Professionals'; conf = 'med'; note = 'Only "working professionals" is stated — confirm the tenant type'; }
+    if (opts.length > 1) conflict('tenantType', opts, 'The message gives conflicting tenant rules');
+    else if (val) set('tenantType', val, conf, note);
+  })();
+
+  /* ── POSSESSION ── */
+  (function () {
+    const out = [];
+    if (/\b(?:immediate(?:ly)?|ready\s+to\s+move|available\s+now|vacant|possession\s+(?:now|immediate)|move[\s-]in\s+ready|available\s+immediately)\b/i.test(Tn)) out.push('Immediate');
+    const MON = '(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*';
+    let m;
+    const cap = function (s) { return s.charAt(0).toUpperCase() + s.slice(1, 3).toLowerCase(); };
+    const r1 = new RegExp('(?:from|on|by|after|w\\.?e\\.?f\\.?|vacating(?:\\s+on)?|available(?:\\s+from)?|possession(?:\\s+(?:from|on))?)\\s*[:\\-–]?\\s*(?:the\\s+)?(\\d{1,2})(?:st|nd|rd|th)?\\s*(?:of\\s+)?' + MON + '(?:\\s*,?\\s*(20\\d\\d))?', 'gi');
+    const r2 = new RegExp('(?:from|on|by|after|w\\.?e\\.?f\\.?|vacating(?:\\s+on)?|available(?:\\s+from)?|possession(?:\\s+(?:from|on))?)\\s*[:\\-–]?\\s*' + MON + '\\s*(\\d{1,2})(?:st|nd|rd|th)?(?:\\s*,?\\s*(20\\d\\d))?', 'gi');
+    while ((m = r1.exec(Tn))) out.push('From ' + parseInt(m[1], 10) + ' ' + cap(m[2]) + (m[3] ? ' ' + m[3] : ''));
+    while ((m = r2.exec(Tn))) out.push('From ' + parseInt(m[2], 10) + ' ' + cap(m[1]) + (m[3] ? ' ' + m[3] : ''));
+    const r3 = new RegExp('(?:from|in|by|after|available(?:\\s+from)?|possession(?:\\s+(?:from|in))?)\\s*[:\\-–]?\\s*(early|mid|end|first\\s+week|second\\s+week|third\\s+week|last\\s+week)(?:\\s+of)?\\s+' + MON, 'gi');
+    while ((m = r3.exec(Tn))) out.push('From ' + m[1].split(/\s+/).map(cap1).join(' ') + ' ' + cap(m[2]));
+    if (!out.length) {
+      const r4 = /\b(?:from|in)\s+(next\s+month|1st\s+of\s+next\s+month)\b/i.exec(Tn);
+      if (r4) out.push('From ' + cap1(r4[1].replace(/^1st\s+of\s+/i, '')));
+    }
+    const u = uniq(out);
+    if (u.length === 1) set('possession', u[0], 'high');
+    else if (u.length > 1) conflict('possession', u, 'Message gives more than one availability');
+  })();
+
+  /* ── BUILDING NAME ── */
+  (function () {
+    const label = /(?:building|bldg|project|tower|society)\s*(?:name)?\s*[:\-–=]\s*([^\n,;|(]{3,50})/i.exec(Tn);
+    if (label) {
+      const v = label[1].replace(/\s+(?:in|at|near|opp|available|for)\b.*$/i, '').trim();
+      if (v.length >= 3 && !/\d\s*bhk/i.test(v)) { set('building', smartCase(v), 'high'); return; }
+    }
+    const textHasUpper = /[A-Z]/.test(Tn);
+    const ROADW = /^(?:road|rd|lane|marg|street|cross|link|back|station|mall|metro|bus|stop|highway|junction|circle|signal|naka)$/i;
+    const STOP = new Set(['studio','bedroom','rk','allowed','friendly','pet','pets','family','bachelors','bachelor','parking','deposit','rent','furnished','unfurnished','possession','immediate','building','society','no','not','ok','welcome','also','only','available','in','at','near','opp','opposite','for','rent','bhk','available','fully','furnished','semi','sale','flat','apartment','apartments','the','a','an','new','luxury','luxurious','spacious','beautiful','premium','modern','sea','view','facing','residential','independent','prime','located','location','with','and','only','on','of','to','from','this','that','large','big','brand','newly','renovated','posh','elegant','exclusive','ready','vacant','1','2','3','4']);
+    const GENERIC = /^(?:luxury|luxurious|furnished|spacious|independent|residential|beautiful|new|old|premium|modern|sea|view|facing|fully|semi|bhk|flat|posh|elegant|prime|brand|newly|renovated|exclusive|large|big|housing|cooperative|co-operative|gated|private|twin|tall|high|rise|well|maintained|good|nice|great)$/i;
+    const SUF = 'Apartments?|Towers?|Heights|Residency|Residences?|Society|CHS|Villa|Villas|Court|House|Manor|Chambers|Mansion|Enclave|Plaza|Terraces?|Gardens?|Estate|Niwas|Bhavan|Arcade|Heritage|Pride|Paradise|Square|Vista|Crest|Horizon|Landmark|Orchid|Greens|Springs|Grove|Lodge|Legacy|Skyline|Pinnacle|Palace|Complex|Building|Bldg|Co-?op(?:erative)?|Sadan|Kunj|Mahal|Chambers|Park';
+    const BRANDS = 'Lodha|Oberoi|Rustomjee|Raheja|Prestige|Godrej|Piramal|Runwal|Kalpataru|Wadhwa|Omkar|Shapoorji|Ruparel|Sunteck|Dosti|Mahindra|Evershine|Adani|Neelkanth|Prescon|Bhoomi|Sheth|Ekta|Rizvi|Ashar|Nahar|Kanakia|Samarth|Acme|Ajmera|Romell|Tata|Indiabulls|Sai|Raunak|Satra|Hubtown|Vasant|Transcon|Marathon|Orbit|Piramal|Imperial|Three\\s+Sixty\\s+West|One\\s+Avighna|Avighna|Ahuja';
+    const cands = [];
+    let m;
+    const reS = new RegExp('((?:[A-Za-z][A-Za-z\'&-]*\\s+){1,3})(' + SUF + ')\\b', 'gi');
+    while ((m = reS.exec(Tn))) {
+      const words = m[1].trim().split(/\s+/);
+      while (words.length && STOP.has(words[0].toLowerCase())) words.shift();
+      if (!words.length) continue;
+      if (words.some(function (w) { return GENERIC.test(w); })) continue;
+      if (textHasUpper && words.some(function (w) { return !/^[A-Z]/.test(w); })) continue;
+      const nm = (words.join(' ') + ' ' + m[2]);
+      if (/\b(?:road|rd|lane|marg|street|cross|link|station|metro|bus)\b/i.test(nm)) continue;
+      if (/^park$/i.test(m[2]) && words.length === 0) continue;
+      cands.push(nm);
+    }
+    const reB = new RegExp('\\b(' + BRANDS + ')\\s+([A-Za-z][A-Za-z\'’&-]*(?:\\s+[A-Za-z][A-Za-z\'’&-]*){0,2})', 'gi');
+    while ((m = reB.exec(Tn))) {
+      const w = m[2].split(/\s+/);
+      const keep = [];
+      for (let i = 0; i < w.length; i++) { if (STOP.has(w[i].toLowerCase()) || GENERIC.test(w[i]) || ROADW.test(w[i]) || /^\d/.test(w[i])) break; keep.push(w[i]); }
+      if (keep.length) cands.push(m[1] + ' ' + keep.join(' '));
+      else if (/^(?:Hiranandani|Lokhandwala)$/i.test(m[1])) { /* area names, skip */ }
+    }
+    // a "building" that is only locality names (e.g. Powai Hiranandani Gardens) is really a location
+    const isOnlyLocality = function (c) {
+      let rest = c;
+      findLocalities(c).forEach(function (h) { rest = rest.replace(new RegExp(h.name.replace(/ /g, '\\s+'), 'i'), ' '); });
+      rest = rest.replace(new RegExp('\\b(?:' + SUF + ')\\b', 'gi'), ' ').replace(/\b(?:west|east|w|e)\b/gi, ' ').trim();
+      return rest === '';
+    };
+    const cleaned = uniq(cands.map(function (c) { return smartCase(c.replace(/\s+/g, ' ').trim()); }))
+      .filter(function (c) { return !isOnlyLocality(c); });
+    // drop names that are just substrings of another candidate
+    const final = cleaned.filter(function (c) { return !cleaned.some(function (o) { return o !== c && o.toLowerCase().indexOf(c.toLowerCase()) >= 0; }); });
+    if (final.length === 1) set('building', final[0], 'med', 'Building name picked from the wording — confirm');
+    else if (final.length > 1) conflict('building', final, 'More than one possible building name');
+  })();
+
+  /* ── LOCATION ── */
+  (function () {
+    let hits = findLocalities(Tn);
+    let labelM = null;
+    (function () {
+      const re = /(?:location|loc|area|locality|address|situated\s+(?:at|in)|located\s+(?:at|in))\s*[:\-–=]\s*([^\n]{3,70})/gi;
+      let x;
+      while ((x = re.exec(Tn))) {
+        const pre = Tn.slice(Math.max(0, x.index - 14), x.index);
+        if (/(?:carpet|built[\s-]?up|super|saleable|total|plot|floor|usable)\s*$/i.test(pre)) continue;
+        if (/^\s*[\d₹]/.test(x[1])) continue;
+        labelM = x; break;
+      }
+    })();
+    const lmRe = /\b(?:near|opp(?:osite|\.)?|behind|next\s+to|adjacent\s+to|walking\s+distance\s+(?:from|to)|close\s+to)\s+([A-Za-z0-9][A-Za-z0-9 '&.\-]{2,34}?)(?=[,.;\n(]|\s{2,}|$|\s+(?:and|with|only|for|on|at|available|rent|furnished|semi|fully)\b)/i;
+    function landmarkOf(s) { const x = lmRe.exec(s); return x ? ' - near ' + smartCase(x[1].replace(/\s+(?:and|with)$/i, '').trim()) : ''; }
+    function compose(list, scope) {
+      const prim = list.filter(function (h) { return !h.landmark; });
+      const use = prim.length ? prim : list;
+      const micro = use.filter(function (h) { return h.type === 'micro'; });
+      const locs = use.filter(function (h) { return h.type === 'loc'; });
+      const locKeys = uniq(locs.map(function (h) { return h.name + '|' + h.dir; }));
+      const baseNames = uniq(locs.map(function (h) { return h.name; }));
+      if (baseNames.length > 1) {
+        // same base twice with/without direction is not a conflict
+        const opts = baseNames.map(function (b) { const hh = locs.filter(function (h) { return h.name === b; }); const w = hh.find(function (h) { return h.dir; }); return b + (w ? ' ' + w.dir : ''); });
+        return { conflict: opts };
+      }
+      let loc = '';
+      if (locs.length) { const wd = locs.find(function (h) { return h.dir; }); loc = locs[0].name + (wd ? ' ' + wd.dir : ''); }
+      const mic = micro.length ? uniq(micro.map(function (h) { return h.name; })).slice(0, 2).join(', ') : '';
+      const out = [mic, loc].filter(Boolean).join(', ');
+      return { value: out, hasDirMissing: locs.length && !locs.find(function (h) { return h.dir; }) && DIR_BASES.indexOf(locs[0].name) >= 0, onlyLandmark: !prim.length };
+    }
+    if (labelM) {
+      const txt = labelM[1].trim();
+      const lh = findLocalities(txt);
+      const lm = landmarkOf(txt);
+      if (lh.length) {
+        const c = compose(lh);
+        if (c.conflict) { conflict('loc', c.conflict, 'More than one area named'); return; }
+        set('loc', c.value + lm, 'high', c.hasDirMissing ? 'East / West not stated in the message' : '');
+        if (c.hasDirMissing) flag('info', 'loc', 'East/West not stated for ' + c.value);
+        return;
+      }
+      const raw = txt.replace(/\s+(?:available|for\s+rent|on\s+rent)\b.*$/i, '').trim();
+      set('loc', smartCase(raw), 'med', 'Location read as written — not a recognised Mumbai locality, check spelling');
+      return;
+    }
+    if (!hits.length) return;
+    const c = compose(hits);
+    if (c.conflict) { conflict('loc', c.conflict, 'More than one area is named in the message'); return; }
+    if (!c.value) return;
+    const lm = landmarkOf(Tn);
+    set('loc', c.value + lm, c.onlyLandmark ? 'med' : 'high', c.onlyLandmark ? 'This area is only mentioned as a landmark — confirm' : (c.hasDirMissing ? 'East / West not stated in the message' : ''));
+    if (c.hasDirMissing && !c.onlyLandmark) flag('info', 'loc', 'East/West not stated for ' + c.value);
+  })();
+
+  /* ── BROKERAGE ── */
+  (function () {
+    const t = Tn;
+    let m;
+    const noB = /\b(?:no|zero|nil)\s+(?:brokerage|brkg|commission)\b|\bbrokerage\s*[:\-–=]\s*(?:nil|nill|none|no|zero|0)\b/i.test(t);
+    const p = function (n, u) { n = String(n).replace(/^(?:one|1)$/i, '1').replace(/^half$/i, '0.5').replace(/^two$/i, '2'); const un = /^d/i.test(u) ? 'Day' : 'Month'; const num = parseFloat(n); const word = (num === 1 ? un : un + 's'); return (n === '0.5' ? '0.5 Month' : num + ' ' + word); };
+    const found = [];
+    const r1 = /(?:brokerage|brkg|bkg|commission)\s*(?:is|:|-|–|=|@)?\s*(?:of\s+)?(\d+(?:\.\d+)?|half|one|two)\s*(months?|mths?|days?)\b/gi;
+    const r2 = /(\d+(?:\.\d+)?|half|one|two)\s*(months?|mths?|days?)\s*(?:of\s*)?(?:brokerage|brkg|commission)/gi;
+    const r3 = /(?:brokerage|brkg|commission)\s*[:\-–=]?\s*(?:₹\s*)?(\d[\d,]*)\s*(%|k|l)?\s*(?:\b|$)/gi;
+    while ((m = r1.exec(t))) found.push(p(m[1], m[2]));
+    while ((m = r2.exec(t))) found.push(p(m[1], m[2]));
+    if (!found.length) {
+      while ((m = r3.exec(t))) {
+        const n = m[1].replace(/,/g, '');
+        if (m[2] === '%') found.push(n + '%');
+        else if (parseFloat(n) >= 1000 || m[2]) found.push('₹' + inr(parseFloat(n) * (m[2] === 'k' ? 1e3 : (m[2] === 'l' ? 1e5 : 1))));
+      }
+    }
+    const u = uniq(found);
+    if (u.length === 1) {
+      const bothSides = /\b(?:both\s+sides?|each\s+side|from\s+both|each\b)/i.test(t);
+      set('brokerage', u[0] + (bothSides ? ' (each side)' : ''), 'high');
+    } else if (u.length > 1) conflict('brokerage', u, 'Different brokerage terms in the message');
+    else if (noB) set('brokerage', 'None', 'high');
+  })();
+
+  /* ── INSPECTION NOTICE ── */
+  (function () {
+    const out = [];
+    let m;
+    const r1 = /(\d+)\s*(?:-\s*)?(hours?|hrs?|hr|days?)\s*(?:prior\s*|advance\s*|previous\s*)?(?:notice|intimation|appointment|info|information)/gi;
+    const r2 = /(?:inspection|viewing|visit|site\s*visit)s?[^\n]{0,30}?(\d+)\s*(hours?|hrs?|hr|days?)\b/gi;
+    const r3 = /(?:notice|intimation|appointment)\s*(?:period)?\s*(?:of|:|-|–|=)?\s*(\d+)\s*(hours?|hrs?|days?)\b/gi;
+    const fmt = function (n, u) { return n + ' ' + (/^d/i.test(u) ? (parseInt(n, 10) === 1 ? 'Day' : 'Days') : (parseInt(n, 10) === 1 ? 'Hour' : 'Hours')); };
+    while ((m = r1.exec(Tn))) out.push(fmt(m[1], m[2]));
+    while ((m = r2.exec(Tn))) out.push(fmt(m[1], m[2]));
+    while ((m = r3.exec(Tn))) out.push(fmt(m[1], m[2]));
+    const u = uniq(out);
+    if (u.length === 1) set('inspection', u[0], 'high');
+    else if (u.length > 1) conflict('inspection', u, 'Different notice periods in the message');
+    else if (/\b(?:by\s+appointment|prior\s+appointment|appointment\s+(?:only|required)|on\s+appointment)\b/i.test(Tn)) set('inspection', 'By appointment', 'high');
+  })();
+
+  /* ── CONTACT NUMBER(S) ── */
+  const uniqPhones = uniq(phones.map(function (p) { return fmtPhone(p); }));
+  if (uniqPhones.length === 1) set('number', uniqPhones[0], 'high');
+  else if (uniqPhones.length > 1) conflict('number', uniqPhones.concat([uniqPhones.join(' / ')]), uniqPhones.length + ' phone numbers in the message — pick who to call (or use both)');
+  else if (ctx && ctx.senderPhone) set('number', ctx.senderPhone, 'med', 'Number comes from the chat header — confirm it is the one to call');
+
+  /* ── CONTACT PERSON ── */
+  (function () {
+    const BAD = /^(?:call|contact|whatsapp|mobile|mob|number|phone|ph|owner|broker|regards|thanks|thank|dm|msg|message|rent|for|available|reach|me|us|details|info|more|best|team|prithjyo|brokerage|deposit|the|and|please|pls|now|today|office|landline|tel|telephone|cell)$/i;
+    const names = [];
+    const lowerNoPhone = T;
+    const ph = findPhones(T);
+    ph.forEach(function (p) {
+      const before = T.slice(Math.max(0, p.idx - 45), p.idx);
+      const lineBefore = before.split('\n').pop();
+      const m = /([A-Z][a-zA-Z]{2,}(?:\s+[A-Z][a-zA-Z]{2,}){0,2})\s*[:\-–,(]*\s*(?:(?:mob|mobile|ph|phone|no|number|cell|whatsapp|wa|contact)\.?\s*[:\-–]?\s*)?[(+]*\s*$/.exec(lineBefore.replace(/\b(?:Mr|Mrs|Ms|Shri|Smt|Dr)\.?\s+/g, ''));
+      if (m) {
+        const nm = m[1].split(/\s+/).filter(function (w) { return !BAD.test(w); }).join(' ');
+        if (nm.length >= 3) names.push(smartCase(nm));
+      } else {
+        const m3 = /(?:contact|call|ph|phone|mob|mobile|whatsapp|wa|reach|number|no)\.?\s*(?:person)?\s*[:\-–]?\s*([a-z]{3,}(?:\s+[a-z]{3,})?)\s*[:\-–(]*\s*$/i.exec(lineBefore);
+        if (m3) {
+          const nm = m3[1].split(/\s+/).filter(function (w) { return !BAD.test(w); }).join(' ');
+          if (nm.length >= 3) names.push(smartCase(nm));
+        }
+      }
+      const after = T.slice(p.idx + p.len, p.idx + p.len + 40).split('\n')[0];
+      const m2 = /^\s*[:\-–,(]*\s*\(?\s*(?:Mr\.?\s+|Ms\.?\s+|Mrs\.?\s+|Shri\s+)?([A-Z][a-zA-Z]{2,}(?:\s+[A-Z][a-zA-Z]{2,})?)\s*\)?\s*$/.exec(after);
+      if (m2 && !BAD.test(m2[1].split(' ')[0])) names.push(smartCase(m2[1]));
+    });
+    const sg = /(?:regards|thanks|thank\s+you|warm\s+regards|best\s+regards|contact\s*(?:person)?)\s*[:,\-–]?\s*\n?\s*([A-Z][a-zA-Z]{2,}(?:\s+[A-Z][a-zA-Z]{2,}){0,2})\s*$/im.exec(T);
+    if (sg && !BAD.test(sg[1].split(' ')[0])) names.push(smartCase(sg[1]));
+    const lbl = /(?:contact\s*person|owner\s*name|broker\s*name|name)\s*[:\-–=]\s*([A-Za-z][A-Za-z .]{2,40})/i.exec(T);
+    if (lbl) names.push(smartCase(lbl[1].trim().replace(/\s+(?:mob|ph|no|number).*$/i, '')));
+    const u = uniq(names.filter(function (n) { return n && !BAD.test(n); }));
+    if (u.length === 1) set('contact', u[0], 'high');
+    else if (u.length > 1) conflict('contact', u, 'More than one contact name in the message');
+    else if (ctx && ctx.sender && !/^\+?\d[\d\s\-]+$/.test(ctx.sender)) set('contact', smartCase(ctx.sender), 'med', 'Taken from the sender / poster name — confirm this is who to call');
+  })();
+
+  /* ── SOURCE / AGENT ── */
+  (function () {
+    const ch = ctx && ctx.channel;
+    const chName = ch === 'whatsapp' ? 'WhatsApp' : (ch === 'facebook' ? 'Facebook' : '');
+    const owner = /\b(?:direct\s+owner|from\s+owner|owner\s+(?:listing|property|contact|number|direct)|owner\s*:|by\s+owner)\b/i.test(Tn);
+    const who = (ctx && ctx.sender && !/^\+?\d[\d\s\-]+$/.test(ctx.sender)) ? smartCase(ctx.sender) : '';
+    const parts = [chName, who].filter(Boolean);
+    let v = parts.join(' – ');
+    if (owner) v = (v ? v + ' · ' : '') + 'Owner direct';
+    if (v) set('source', v, chName ? 'high' : 'med', chName ? '' : 'Source guessed from the wording');
+  })();
+
+  /* ── NOTES + HIGHLIGHT (client-facing, so nothing internal goes in) ── */
+  (function () {
+    const t = Tn;
+    const notes = [];
+    const hl = [];
+    let m;
+    // floor
+    const fl = /(\d{1,2})(?:st|nd|rd|th)?\s*floor(?:\s*(?:out\s+of|of|\/)\s*(\d{1,2}))?/i.exec(t);
+    if (fl && parseInt(fl[1], 10) <= 80) notes.push(ordinal(fl[1]) + ' floor' + (fl[2] ? ' of ' + fl[2] : ''));
+    else if (/\bhigh\s+floor\b/i.test(t)) notes.push('High floor');
+    else if (/\blow\s+floor\b/i.test(t)) notes.push('Low floor');
+    else if (/\bmid(?:dle)?\s+floor\b/i.test(t)) notes.push('Mid floor');
+    else if (/\bground\s+floor\b/i.test(t)) notes.push('Ground floor');
+    // view
+    const views = [];
+    if (/\bsea[\s-]?(?:facing|view|face)\b|\bview\s+of\s+(?:the\s+)?sea\b/i.test(t)) views.push('Sea facing');
+    if (/\bgarden[\s-]?(?:facing|view)\b/i.test(t)) views.push('Garden view');
+    if (/\bcity[\s-]?(?:facing|view)\b/i.test(t)) views.push('City view');
+    if (/\bskyline\s+view\b/i.test(t)) views.push('Skyline view');
+    if (/\bpark[\s-]?(?:facing|view)\b/i.test(t)) views.push('Park view');
+    if (/\bsea[\s-]?link\s+view\b/i.test(t)) views.push('Sea Link view');
+    views.forEach(function (v) { notes.push(v); hl.push(v); });
+    // condition
+    if (/\bnewly\s+renovated\b|\brecently\s+renovated\b|\bfreshly\s+renovated\b/i.test(t)) { notes.push('Newly renovated'); hl.push('Newly renovated'); }
+    else if (/\brenovated\b/i.test(t)) notes.push('Renovated');
+    if (/\bbrand[\s-]?new\s+(?:building|flat|apartment|property|construction)\b|\bbrand[\s-]?new\b/i.test(t)) { notes.push('Brand new'); hl.push('Brand new'); }
+    else if (/\bnew\s+(?:building|construction|tower)\b/i.test(t)) { notes.push('New building'); hl.push('New building'); }
+    if (/\bwell[\s-]maintained\b/i.test(t)) notes.push('Well maintained');
+    if (/\bre-?developed\b|\bredevelopment\b/i.test(t)) notes.push('Redeveloped building');
+    // rooms
+    const bath = /(\d)\s*(?:bath(?:room)?s?|toilets?|washrooms?)\b/i.exec(t);
+    if (bath) notes.push(bath[1] + ' bathrooms');
+    if (/\battached\s+bath/i.test(t)) notes.push('Attached bathrooms');
+    ['study(?:\\s+room)?', 'servant(?:s)?\\s+room', 'maid(?:s)?\\s+room', 'utility\\s+(?:room|area)', 'store\\s*room', 'walk[\\s-]in\\s+(?:closet|wardrobe)', 'dry\\s+balcony', 'terrace', 'balcon(?:y|ies)'].forEach(function (p) {
+      const mm = new RegExp('\\b' + p + '\\b', 'i').exec(t);
+      if (mm) notes.push(cap1(mm[0].toLowerCase().replace(/servants?\s/, 'servant ').replace(/maids?\s/, 'maid ')));
+    });
+    // furniture / appliances
+    const inc = [];
+    [[/\bac\b|\ba\.c\.|\bair[\s-]?condition(?:er|ed|ing)?s?\b/i, 'AC'], [/\bmodular\s+kitchen\b/i, 'Modular kitchen'], [/\bwashing\s+machine\b/i, 'Washing machine'], [/\b(?:fridge|refrigerator)\b/i, 'Fridge'],
+     [/\b(?:tv|television)\b/i, 'TV'], [/\bsofa\b/i, 'Sofa'], [/\bwardrobes?\b/i, 'Wardrobes'], [/\bgeysers?\b/i, 'Geyser'], [/\bchimney\b/i, 'Chimney'], [/\bhob\b/i, 'Hob'], [/\bmicrowave\b/i, 'Microwave'], [/\bdish\s*washer\b/i, 'Dishwasher'], [/\bwater\s+purifier\b|\bro\s+(?:system|purifier)\b/i, 'Water purifier'], [/\binduction\b/i, 'Induction'], [/\bbed(?:s)?\s+with\s+mattress|\bmattress\b/i, 'Beds with mattress'], [/\bcurtains?\b/i, 'Curtains'], [/\bdining\s+table\b/i, 'Dining table']].forEach(function (p) { if (p[0].test(t)) inc.push(p[1]); });
+    if (inc.length) notes.push('Includes: ' + inc.join(', '));
+    // amenities
+    const am = [];
+    [[/\bgym(?:nasium)?\b/i, 'Gym'], [/\bswimming\s*pool\b|\bpool\b/i, 'Swimming pool'], [/\bclub\s*house\b/i, 'Clubhouse'], [/\bgarden\b(?!\s*(?:view|facing))/i, 'Garden'], [/\bkids?\s+play\s*(?:area|ground)\b|\bchildren'?s?\s+play/i, 'Kids play area'], [/\bjogging\s+track\b/i, 'Jogging track'],
+     [/\b24\s*[x*\/]\s*7\s+security\b|\b24\s*hrs?\s+security\b/i, '24x7 security'], [/\bcctv\b/i, 'CCTV'], [/\b(?:lift|elevator)s?\b/i, 'Lift'], [/\bpower\s+back[\s-]?up\b|\bgenerator\b/i, 'Power backup'], [/\bintercom\b/i, 'Intercom'], [/\b(?:mahanagar\s+)?gas\s+pipeline\b|\bmgl\b/i, 'Piped gas'], [/\bvideo\s+door\s*phone\b/i, 'Video door phone'], [/\bparty\s+hall\b/i, 'Party hall'], [/\bindoor\s+games\b/i, 'Indoor games'], [/\bev\s+charging\b/i, 'EV charging'], [/\bterrace\s+garden\b/i, 'Terrace garden'], [/\bspa\b|\bsauna\b|\bjacuzzi\b/i, 'Spa / jacuzzi'], [/\bbadminton\b|\btennis\b|\bsquash\b|\bsports\s+court\b/i, 'Sports court']].forEach(function (p) { if (p[0].test(t) && am.indexOf(p[1]) < 0) am.push(p[1]); });
+    // "security" alone isn't in the list on purpose (the word appears in 'security deposit')
+    if (am.length) notes.push('Amenities: ' + am.join(', '));
+    if (/\b(?:mechanical|stack|puzzle)\s+parking\b/i.test(t)) notes.push('Mechanical parking');
+    if (/\bcovered\s+parking\b/i.test(t) && !fields.parking) notes.push('Covered parking');
+    // lease terms
+    const lock = /lock[\s-]?in\s*(?:period)?\s*[:\-–=]?\s*(?:of\s*)?(\d+)\s*(months?|mths?|yrs?|years?)/i.exec(t);
+    if (lock) notes.push('Lock-in ' + lock[1] + ' ' + (/^y/i.test(lock[2]) ? (lock[1] === '1' ? 'year' : 'years') : (lock[1] === '1' ? 'month' : 'months')));
+    const agr = /(\d+)\s*(?:months?|mths?)\s*(?:agreement|lease|leave\s*(?:and|&)\s*license|l\s*&\s*l)|(?:agreement|lease|l\s*&\s*l)\s*(?:of|for|:)?\s*(\d+)\s*(?:months?|mths?)/i.exec(t);
+    if (agr) notes.push((agr[1] || agr[2]) + '-month agreement');
+    const mAm = amts.filter(function (x) { return x.kind === 'maint' && x.v >= 500 && x.v <= 200000; })[0];
+    const mWord = /\bmaintenance\s+(?:charges?\s+)?(?:are\s+)?(included|extra|excluded|separate)\b|\b(inclusive|exclusive)\s+of\s+maintenance\b/i.exec(t);
+    if (mAm) {
+      const ln = (mAm.line || '');
+      const extra = /\+|extra|additional|separate|over\s+and\s+above/i.test(Tn.split('\n').filter(function (l) { return /maint/i.test(l); }).join(' '));
+      notes.push('Maintenance ₹' + inr(mAm.v) + (extra ? ' extra' : ''));
+    } else if (mWord) {
+      const w = (mWord[1] || mWord[2]).toLowerCase();
+      notes.push(/included|inclusive/.test(w) ? 'Maintenance included' : 'Maintenance extra');
+    }
+    // occupancy / house rules
+    const mo = /(?:max(?:imum)?|upto|up\s+to|only)\s*(\d)\s*(?:persons?|people|occupants?|members?|adults?)\b/i.exec(t);
+    if (mo) notes.push('Max ' + mo[1] + ' occupants');
+    if (/\bno\s+sharing\b|\bsharing\s+(?:is\s+)?not\s+allowed\b|\bnot\s+for\s+sharing\b/i.test(t)) notes.push('No sharing');
+    else if (/\bsharing\s+(?:is\s+)?allowed\b|\bsharing\s+ok\b/i.test(t) && !occupancy) notes.push('Sharing allowed');
+    if (/\bno\s+smoking\b|\bnon[\s-]smokers?\b/i.test(t)) notes.push('No smoking');
+    if (/\bno\s+parties\b|\bno\s+loud\s+music\b/i.test(t)) notes.push('No parties');
+    if (/\bnon[\s-]?veg\s+(?:allowed|ok)\b/i.test(t)) notes.push('Non-veg allowed');
+    if (/\bexpats?\s+(?:welcome|ok|allowed)\b|\bforeigners?\s+(?:welcome|ok|allowed)\b/i.test(t)) notes.push('Expats welcome');
+    if (/\bstudents?\s+(?:allowed|welcome|ok)\b/i.test(t)) notes.push('Students allowed');
+    if (/\bworking\s+professionals?\b/i.test(t) && !(fields.tenantType && /Professionals/.test(fields.tenantType.value))) notes.push('Working professionals preferred');
+    if (vegOnly) hl.push('Vegetarian only'); else if (vegWord) hl.push(vegWord);
+    if (occupancy) {
+      const oc = /\b(single|double|triple)\s+occupancy\b/i.exec(t);
+      if (oc) notes.unshift(cap1(oc[1].toLowerCase()) + ' occupancy');
+      else if (/\bflat\s*mates?\b|\broom\s*mates?\b/i.test(t)) notes.unshift('Flatmate / room share');
+    }
+    // anything deliberately kept out because it is internal
+    if (/\bnegotiable\b|\bnego\b/i.test(t)) leftOut.push('"Negotiable" — internal, so it is not saved to the client-facing fields');
+    if (/\bowner\s+(?:is\s+)?(?:abroad|out\s+of\s+(?:india|station)|nri)\b/i.test(t)) leftOut.push('Owner availability remark — internal, not saved');
+    if (/\bexclusive\s+mandate\b|\bsole\s+mandate\b|\bmandate\b/i.test(t)) leftOut.push('Mandate remark — internal, not saved');
+    // de-dup + joins
+    const nn = uniq(notes.filter(Boolean));
+    if (nn.length) set('notes', nn.join(' · '), 'high');
+    const hh = uniq(hl).slice(0, 3);
+    if (hh.length) set('highlight', hh.join(' · '), 'med', 'Suggested from facts stated in the message — edit or clear');
+  })();
+
+  /* ── cross-checks (contradictions / sanity) ── */
+  if (fields.area && fields.config) {
+    const a = parseInt(fields.area.value, 10), c = parseFloat(fields.config.value);
+    if (!isNaN(c)) {
+      if (c >= 2 && a < 280) flag('amber', 'area', 'Area ' + a + ' sq ft looks small for a ' + fields.config.value);
+      if (c <= 1 && a > 1600) flag('amber', 'area', 'Area ' + a + ' sq ft looks large for a ' + fields.config.value);
+    }
+  }
+  if (fields.rent) {
+    const r = parseInt(fields.rent.value, 10);
+    if (r < 10000) flag('amber', 'rent', 'Rent ₹' + inr(r) + ' is unusually low — check the figure');
+    if (r > 800000) flag('amber', 'rent', 'Rent ₹' + inr(r) + ' is unusually high — check the figure');
+  }
+  if (fields.possession && fields.possession.value === 'Immediate' && /from\s+\d/i.test(fields.possession.value)) { /* handled by conflict */ }
+  if (occupancy) {
+    flag('red', '', 'This looks like a single-room / flatmate listing. The deck cannot show rooms yet (occupancy line is part of features-v2) — it would appear as a whole flat at this rent.');
+  }
+  if (kind === 'requirement') {
+    flag('red', '', 'This reads like a REQUIREMENT (someone looking for a property), not a listing — the figures are a client budget, not an asking rent.');
+  }
+  if (phones.length === 0 && !(ctx && ctx.senderPhone)) flag('info', 'number', 'No phone number found in the message');
+
+  return { kind: kind, isSale: isSale, occupancy: occupancy, fields: fields, conflicts: conflicts, flags: flags, leftOut: leftOut };
+}
+
+/* ───────────── segmentation (several listings in one message) ───────────── */
+function hasConfig(s) { return /\b\d(?:\.\d)?\s*(?:bhk|rk)\b|\bstudio\b/i.test(s); }
+function hasMoney(s) { return /(?:₹|\brent\b|\bprice\b)\s*[:\-–]?\s*\d|\d\s*(?:k|lakhs?|lacs?|l)\b|\d{2},\d{3}/i.test(s); }
+
+function segmentBlocks(lines) {
+  // 1) hard separators
+  const hard = [];
+  let cur = [];
+  lines.forEach(function (l) { if (l === '\u0001') { hard.push(cur); cur = []; } else cur.push(l); });
+  hard.push(cur);
+  let parts = hard.filter(function (p) { return p.some(function (l) { return l.trim(); }); });
+  // 2) blank-line sub-blocks, only if each side looks like a listing
+  const sub = [];
+  parts.forEach(function (p) {
+    const chunks = [];
+    let c = [];
+    p.forEach(function (l) { if (!l.trim()) { if (c.length) chunks.push(c); c = []; } else c.push(l); });
+    if (c.length) chunks.push(c);
+    sub.push(chunks);
+  });
+  const flat = [].concat.apply([], sub);
+  const listingChunks = flat.filter(function (c) { const j = c.join('\n'); return hasConfig(j) && hasMoney(j); });
+  if (listingChunks.length >= 2) {
+    // header = chunks before the first listing chunk; footer = chunks after the last listing chunk
+    const firstIdx = flat.indexOf(listingChunks[0]);
+    const lastIdx = flat.indexOf(listingChunks[listingChunks.length - 1]);
+    const header = [].concat.apply([], flat.slice(0, firstIdx));
+    const footer = [].concat.apply([], flat.slice(lastIdx + 1));
+    return listingChunks.map(function (c) { return header.concat(c, footer); });
+  }
+  // 3) numbered / bulleted items that each carry a configuration
+  const all = [].concat.apply([], parts).filter(function (l) { return l.trim(); });
+  const starts = [];
+  all.forEach(function (l, i) { if (/^\s*(?:\d{1,2}\s*[).:\-]\s*|[A-D]\s*[).]\s*)?.{0,25}?\b\d(?:\.\d)?\s*(?:bhk|rk)\b/i.test(l) && /^\s*(?:\d{1,2}\s*[).:\-]|[A-D]\s*[).]|\d(?:\.\d)?\s*(?:bhk|rk)\b)/i.test(l)) starts.push(i); });
+  if (starts.length >= 2) {
+    const headerL = all.slice(0, starts[0]);
+    const blocks = starts.map(function (s, k) { return all.slice(s, k + 1 < starts.length ? starts[k + 1] : all.length); });
+    const confs = blocks.map(function (b) { const m = /(\d(?:\.\d)?)\s*(?:bhk|rk)/i.exec(b.join(' ')); return m ? m[1] : ''; });
+    if (uniq(confs).length > 1 || uniq(blocks.map(function (b) { return b.join(' ').match(/\d+\s*k\b|\d{2},\d{3}/i); }).map(String)).length > 1) {
+      return blocks.map(function (b) { return headerL.concat(b); });
+    }
+  }
+  return [[].concat.apply([], parts).filter(function (l) { return l.trim(); })];
+}
+
+/* ───────────── public: read() ───────────── */
+function read(raw, opts) {
+  opts = opts || {};
+  const st = { emoji: 0, hashtags: 0, asterisks: 0, symbols: 0, links: 0, promo: 0, dupes: 0, meta: 0, repeatedMessages: 0 };
+  const corrections = [];
+  let text = String(raw || '').normalize('NFKC').replace(/[\u2018\u2019\u201B]/g, "'").replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u200B-\u200F\u2060\uFEFF\u202A-\u202E]/g, '').replace(/[\u202F\u00A0\u2007\u2009]/g, ' ').replace(/\r\n?/g, '\n');
+  if (!text.trim()) return { empty: true };
+  const channel = detectChannel(text, opts.hint);
+  const msgs = splitMessages(text, channel, st);
+  let senders = [];
+  const blocks = [];
+  const seen = new Set();
+  msgs.forEach(function (msg) {
+    let lines = msg.lines;
+    let sender = msg.sender;
+    if (channel === 'facebook' || (channel === 'unknown' && lines.some(function (l) { return RE_FB_TIME.test(l.trim()) && /[·•]/.test(l); }))) {
+      const fb = stripFacebook(lines, st);
+      lines = fb.lines; if (fb.sender) sender = sender || fb.sender;
+    }
+    const out = [];
+    lines.forEach(function (l) {
+      const t = l.trim();
+      if (!t) { out.push(''); return; }
+      if (RE_WA_NOISE.test(t)) { st.meta++; return; }
+      const c = cleanLine(l, st);
+      out.push(c);
+    });
+    // promo phrases
+    const pro = out.map(function (l) {
+      if (!l || l === '\u0001') return l;
+      let n = 0;
+      const r = l.replace(PROMO, function () { n++; return ' '; }).replace(/\s+/g, ' ').trim();
+      st.promo += n;
+      const t2 = r.replace(/^[\s:,\-–!.]+|[\s:,\-–!]+$/g, '').replace(/\s+([!.,])/g, '$1');
+      return /[\p{L}\p{N}]/u.test(t2) ? t2 : '';
+    });
+    const segs = segmentBlocks(pro);
+    segs.forEach(function (seg) {
+      // drop duplicate lines inside this block + doubled words
+      const keySeen = new Set();
+      const kept = [];
+      seg.forEach(function (l) {
+        if (!l || !l.trim()) return;
+        const key = l.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (key.length > 3 && keySeen.has(key)) { st.dupes++; return; }
+        keySeen.add(key);
+        kept.push(l.replace(/\b(\w{3,})\s+\1\b/gi, function (m, w) { st.dupes++; return w; }));
+      });
+      let body = kept.join('\n');
+      body = fixTypos(body, corrections);
+      body = normalizeUnits(body);
+      const sig = body.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!sig) return;
+      if (seen.has(sig)) { st.repeatedMessages++; return; }
+      seen.add(sig);
+      blocks.push({ text: body, sender: sender });
+    });
+  });
+  if (!blocks.length) return { empty: true, stats: st };
+
+  const results = blocks.map(function (b) {
+    let senderPhone = '';
+    if (b.sender && /^\+?\d[\d\s\-]{8,}$/.test(b.sender)) { const ph = findPhones(b.sender); if (ph[0]) senderPhone = fmtPhone(ph[0]); }
+    const ctx = { channel: channel, sender: b.sender, senderPhone: senderPhone };
+    let res = extractFields(b.text, ctx);
+    if (res.kind === 'requirement' && !opts.force) {
+      res = { kind: 'requirement', fields: {}, conflicts: {}, flags: res.flags, leftOut: [], isSale: false, occupancy: false };
+    }
+    res.text = b.text;
+    res.label = (res.fields.config ? res.fields.config.value : (res.conflicts.config ? res.conflicts.config.options.join('/') : '?')) +
+      (res.fields.loc ? ' · ' + res.fields.loc.value : '') +
+      (res.fields.rent ? ' · ₹' + inr(parseInt(res.fields.rent.value, 10)) : '');
+    return res;
+  });
+
+  const displayText = blocks.map(function (b) { return b.text; }).join('\n\n— — —\n\n');
+  return {
+    empty: false, channel: channel, stats: st, corrections: corrections, blocks: results,
+    cleaned: displayText, sender: blocks[0].sender || ''
+  };
+}
+
+return { read: read, _inr: inr, _findPhones: findPhones, _extract: extractFields };
+})();
+
+</script>
+<script>
+/* ════════════════ PRITHJYO ADD-LISTING — UI (build v3) ════════════════ */
+const PASSWORD = 'prithjyo2026';
+const CLOUD = 'dayfllzwe';
+const PRESET = 'prithjyo_listings';
+const MODE = 'flat'; // 'flat' | 'room'
+const ROOM = MODE === 'room';
+const ADD_ENDPOINT = ROOM ? '/api/add-room' : '/api/add-listing';
+const IMG_MAX_MB = 10, VID_MAX_MB = 100;
+
+function $(id) { return document.getElementById(id); }
+function val(id) { const el = $(id); return el ? el.value.trim() : ''; }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+/* ── LOCK ── */
+function unlock() {
+  const pw = $('lock-pw').value;
+  if (pw === PASSWORD) {
+    $('lock').style.display = 'none';
+    $('app').style.display = 'block';
+    $('action-bar').style.display = 'block';
+  } else {
+    $('lock-error').textContent = 'Incorrect password.';
+    $('lock-pw').value = '';
+    $('lock-pw').focus();
+  }
+}
+
+/* ── FIELD MAP: engine key → input id ── */
+const FIELD_ID = {
+  config: 'f-config', area: 'f-area', rent: 'f-rent', deposit: 'f-deposit', furn: 'f-furn', parking: 'f-parking',
+  pets: 'f-pets', tenantType: 'f-tenant', possession: 'f-possession', building: 'f-building', loc: 'f-loc',
+  brokerage: 'f-brokerage', inspection: 'f-inspection', number: 'f-number', contact: 'f-contact',
+  source: 'f-source', notes: 'f-notes', highlight: 'f-highlight'
+};
+const FIELD_NAME = {
+  code: 'Property Code', loc: 'Location', config: 'Configuration', area: 'Carpet Area', furn: 'Furnishing', parking: 'Parking',
+  rent: 'Rent', deposit: 'Deposit', pets: 'Pets', tenantType: 'Tenant Type', possession: 'Possession', building: 'Building Name',
+  notes: 'Notes', highlight: 'Highlight', contact: 'Contact Person', number: 'Number', brokerage: 'Brokerage',
+  inspection: 'Inspection Notice', source: 'Source / Agent'
+};
+const ALL_IDS = ['prop-code', 'f-loc', 'f-config', 'f-area', 'f-furn', 'f-parking', 'f-rent', 'f-deposit', 'f-pets', 'f-tenant', 'f-possession', 'f-building', 'f-notes', 'f-highlight', 'f-contact', 'f-number', 'f-brokerage', 'f-inspection', 'f-source'];
+if (ROOM) { FIELD_ID.flat = 'f-flat'; FIELD_NAME.flat = 'Flat type'; FIELD_NAME.config = 'Occupancy'; FIELD_NAME.area = 'Room Area'; FIELD_NAME.tenantType = 'Flatmate Preference'; FIELD_NAME.rent = 'Rent per person'; ALL_IDS.push('f-flat'); }
+const ID_TO_KEY = { 'prop-code': 'code' };
+Object.keys(FIELD_ID).forEach(k => { ID_TO_KEY[FIELD_ID[k]] = k; });
+
+/* ── per-field state: {kind:'ok'|'check'|'conflict'|'info', msg, options} ── */
+const fstate = {};
+const touched = {};
+
+function flagEl(id) {
+  const input = $(id);
+  if (!input) return null;
+  let f = input.parentNode.querySelector('.flag[data-for="' + id + '"]');
+  if (!f) {
+    f = document.createElement('div');
+    f.className = 'flag';
+    f.setAttribute('data-for', id);
+    input.parentNode.appendChild(f);
+  }
+  return f;
+}
+function paintField(id) {
+  const input = $(id); if (!input) return;
+  const st = fstate[id];
+  const f = flagEl(id);
+  input.classList.remove('is-auto', 'is-check', 'is-conflict');
+  f.className = 'flag'; f.innerHTML = '';
+  if (!st) return;
+  if (st.kind === 'ok') { input.classList.add('is-auto'); f.className = 'flag flag-ok'; f.innerHTML = '<span class="flag-ic">●</span>Read from message' + (st.msg ? ' — ' + esc(st.msg) : ''); }
+  else if (st.kind === 'check') { input.classList.add('is-check'); f.className = 'flag flag-check'; f.innerHTML = '<span class="flag-ic">▲</span>Check: ' + esc(st.msg || 'please confirm'); }
+  else if (st.kind === 'conflict') {
+    input.classList.add('is-conflict'); f.className = 'flag flag-conflict';
+    f.innerHTML = '<span class="flag-ic">✕</span>' + esc(st.msg || 'The message disagrees with itself') + ' — left blank. Pick one or type it:';
+    const chips = document.createElement('div'); chips.className = 'chips';
+    (st.options || []).forEach(o => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = o;
+      b.addEventListener('click', () => { input.value = o; delete fstate[id]; touched[id] = true; paintField(id); refreshBar(); });
+      chips.appendChild(b);
+    });
+    f.appendChild(chips);
+  } else if (st.kind === 'info') { f.className = 'flag flag-info'; f.innerHTML = '<span class="flag-ic">i</span>' + esc(st.msg); }
+  (st.extra || []).forEach(m => { const d = document.createElement('div'); d.className = 'flag-extra'; d.textContent = m; f.appendChild(d); });
+}
+ALL_IDS.forEach(id => {
+  const el = $(id);
+  el.addEventListener('input', () => {
+    touched[id] = true;
+    if (fstate[id]) { delete fstate[id]; paintField(id); }
+    refreshBar();
+  });
+});
+
+/* ── SMART READER ── */
+let hint = 'auto';
+let lastRead = null;
+let activeBlock = 0;
+let currentBlock = null;
+const appliedBlocks = {};
+
+document.querySelectorAll('.seg-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.seg-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); hint = b.getAttribute('data-src');
+}));
+const msgInput = $('msg-input');
+msgInput.addEventListener('input', () => { $('read-btn').disabled = !msgInput.value.trim(); });
+msgInput.addEventListener('paste', () => {
+  const wasEmpty = !msgInput.value.trim();
+  setTimeout(() => { $('read-btn').disabled = !msgInput.value.trim(); if (wasEmpty && msgInput.value.trim()) runRead(); }, 30);
+});
+$('read-btn').addEventListener('click', runRead);
+$('clear-msg').addEventListener('click', () => { msgInput.value = ''; $('read-btn').disabled = true; $('reader-out').innerHTML = ''; lastRead = null; });
+$('paste-btn').addEventListener('click', async () => {
+  try {
+    const t = await navigator.clipboard.readText();
+    if (t) { msgInput.value = t; $('read-btn').disabled = false; runRead(); return; }
+  } catch (e) { /* fall through */ }
+  msgInput.focus(); toast('Long-press in the box and choose Paste');
+});
+
+function runRead() {
+  const raw = msgInput.value;
+  if (!raw.trim()) return;
+  let r;
+  try { r = PrithjyoReader.read(raw, hint === 'auto' ? {} : { hint: hint }); }
+  catch (e) { $('reader-out').innerHTML = '<div class="r-banner red">The Reader could not process this message (' + esc(e.message) + '). Nothing was filled — please fill the form by hand.</div>'; return; }
+  lastRead = r; activeBlock = 0;
+  Object.keys(appliedBlocks).forEach(k => delete appliedBlocks[k]);
+  if (r.empty || !r.blocks || !r.blocks.length) {
+    $('reader-out').innerHTML = '<div class="r-banner amber">Nothing readable in that message. Nothing was filled.</div>';
+    return;
+  }
+  applyBlock(0);
+}
+
+/* Rooms mode: re-map the flat reader's output onto the room form (same sheet columns, nothing invented) */
+function roomize(b0, cleaned) {
+  const b = { kind: b0.kind, isSale: b0.isSale, occupancy: b0.occupancy, leftOut: b0.leftOut, text: b0.text, label: b0.label, fields: {}, conflicts: {}, flags: [] };
+  Object.keys(b0.fields || {}).forEach(k => { b.fields[k] = b0.fields[k]; });
+  Object.keys(b0.conflicts || {}).forEach(k => { b.conflicts[k] = b0.conflicts[k]; });
+  // flat type = what the reader called "configuration"
+  if (b.fields.config) { b.fields.flat = b.fields.config; delete b.fields.config; }
+  if (b.conflicts.config) { b.conflicts.flat = b.conflicts.config; delete b.conflicts.config; }
+  // occupancy = only what the message literally says
+  const src = (b0.text || '') + ' ' + (cleaned || '');
+  const found = {}; let m; const re = /\b(single|double|triple)\s+occupancy\b/gi;
+  while ((m = re.exec(src))) found[m[1][0].toUpperCase() + m[1].slice(1).toLowerCase() + ' Occupancy'] = true;
+  const kinds = Object.keys(found);
+  if (kinds.length === 1) b.fields.config = { value: kinds[0], conf: 'high', note: '' };
+  else b.conflicts.config = { options: kinds.length ? kinds : ['Single Occupancy', 'Double Occupancy'], note: kinds.length ? 'The message mentions more than one occupancy type' : 'The message does not say single or double occupancy' };
+  // notes: occupancy now has its own field
+  if (b.fields.notes) {
+    const n = String(b.fields.notes.value).replace(/\b(single|double|triple)\s+occupancy\b[\s.,;·|]*/ig, '').replace(/^[\s.,;·|]+|[\s.,;·|]+$/g, '');
+    if (n) b.fields.notes = { value: n, conf: b.fields.notes.conf, note: b.fields.notes.note }; else delete b.fields.notes;
+  }
+  (b0.flags || []).forEach(f => { if (!(f.level === 'red' && !f.field && /single-room \/ flatmate listing/.test(f.msg))) b.flags.push(f); });
+  if (b.kind === 'listing' && !b.occupancy && !b.isSale) b.flags.push({ level: 'amber', field: '', msg: 'This does not read like a room / flatmate post — it may be a whole flat. Use the Flats tool if so.' });
+  return b;
+}
+
+function applyBlock(i) {
+  const b = ROOM ? roomize(lastRead.blocks[i], lastRead.cleaned) : lastRead.blocks[i]; currentBlock = b; activeBlock = i; appliedBlocks[i] = true;
+  // clear earlier auto-filled (untouched) values so a second block never mixes in the first
+  Object.keys(fstate).forEach(id => {
+    if (!touched[id] && ID_TO_KEY[id] !== 'code') { $(id).value = ''; }
+    delete fstate[id]; paintField(id);
+  });
+  const kept = [];
+  const flagsByField = {};
+  (b.flags || []).forEach(fl => { if (fl.field && FIELD_ID[fl.field]) (flagsByField[fl.field] = flagsByField[fl.field] || []).push(fl); });
+
+  Object.keys(b.fields || {}).forEach(k => {
+    const id = FIELD_ID[k]; if (!id) return;
+    const f = b.fields[k]; const el = $(id);
+    if (touched[id] && el.value.trim() && el.value.trim() !== String(f.value)) {
+      kept.push(FIELD_NAME[k]);
+      fstate[id] = { kind: 'info', msg: 'You already entered this — the message says "' + f.value + '". Kept yours.' };
+      paintField(id); return;
+    }
+    el.value = f.value; touched[id] = false;
+    const fl = flagsByField[k] || [];
+    const amber = f.conf && f.conf !== 'high';
+    const bad = fl.filter(x => x.level === 'red' || x.level === 'amber');
+    if (amber || bad.length) {
+      fstate[id] = { kind: 'check', msg: (amber && f.note) ? f.note : (bad[0] ? bad[0].msg : 'please confirm'), extra: bad.filter(x => !(amber && f.note) || x.msg !== f.note).slice(amber && f.note ? 0 : 1).map(x => x.msg) };
+    } else {
+      fstate[id] = { kind: 'ok', msg: f.note || '', extra: fl.filter(x => x.level === 'info').map(x => x.msg) };
+    }
+    paintField(id);
+  });
+  Object.keys(b.conflicts || {}).forEach(k => {
+    const id = FIELD_ID[k]; if (!id) return;
+    const c = b.conflicts[k]; const el = $(id);
+    if (touched[id] && el.value.trim()) return;
+    el.value = ''; touched[id] = false;
+    fstate[id] = { kind: 'conflict', msg: c.note, options: c.options };
+    paintField(id);
+  });
+  renderReaderOut(b, kept);
+  refreshBar();
+  const first = document.querySelector('.is-conflict') || null;
+  if (first) first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+
+function renderReaderOut(b, kept) {
+  const r = lastRead; const out = $('reader-out');
+  const nOk = Object.keys(fstate).filter(id => fstate[id].kind === 'ok').length;
+  const nCheck = Object.keys(fstate).filter(id => fstate[id].kind === 'check').length;
+  const nConf = Object.keys(fstate).filter(id => fstate[id].kind === 'conflict').length;
+  const need = [];
+  if (!val('prop-code')) need.push(ROOM ? 'Room Code' : 'Property Code');
+  ['loc', 'config', 'rent'].forEach(k => { if (!val(FIELD_ID[k])) need.push(FIELD_NAME[k]); });
+  let h = '';
+  if (b.kind === 'requirement') h += '<div class="r-banner red"><b>This looks like a requirement, not a listing</b> (someone is looking for a flat). Only use it if you are sure — the fields below were filled from it.</div>';
+  if (b.isSale) h += '<div class="r-banner red"><b>This looks like a sale post, not a rental.</b> Rent was not filled from a sale price. Check before adding.</div>';
+  if (b.occupancy && !ROOM) h += '<div class="r-banner amber"><b>Shared / single-occupancy post.</b> The rent is probably per person, not for the whole flat — check Rent and Configuration.</div>';
+  (b.flags || []).filter(f => !f.field || !FIELD_ID[f.field]).forEach(f => {
+    if (f.level === 'info') return;
+    h += '<div class="r-banner ' + (f.level === 'red' ? 'red' : 'amber') + '">' + esc(f.msg) + '</div>';
+  });
+  h += '<div class="r-summary">';
+  h += '<span class="pill ok">' + nOk + ' read</span>';
+  if (nCheck) h += '<span class="pill check">' + nCheck + ' to check</span>';
+  if (nConf) h += '<span class="pill conflict">' + nConf + ' conflict' + (nConf > 1 ? 's' : '') + '</span>';
+  if (need.length) h += '<span class="pill need">Still needed: ' + esc(need.join(', ')) + '</span>';
+  h += '</div>';
+  if (kept && kept.length) h += '<div class="r-banner amber">Kept what you had typed for: ' + esc(kept.join(', ')) + '.</div>';
+  if (r.blocks.length > 1) {
+    h += '<div class="r-multi"><div class="r-multi-title">This message has ' + r.blocks.length + ' listings. Fill the form with one, add it, then come back for the next:</div><div class="r-multi-btns">';
+    r.blocks.forEach((bl, i) => {
+      h += '<button type="button" class="chip' + (i === activeBlock ? ' active' : '') + (appliedBlocks[i] && i !== activeBlock ? ' done' : '') + '" data-blk="' + i + '">' + esc(bl.label || ('Listing ' + (i + 1))) + '</button>';
+    });
+    h += '</div></div>';
+  }
+  const s = r.stats || {};
+  const cleanedBits = [['emoji', 'emoji'], ['hashtags', 'hashtags'], ['asterisks', 'asterisks'], ['symbols', 'decorative symbols'], ['links', 'links'], ['promo', 'promo lines'], ['dupes', 'duplicate lines'], ['meta', 'chat/post chrome']]
+    .filter(p => s[p[0]]).map(p => s[p[0]] + ' ' + p[1]);
+  h += '<details class="r-detail"><summary>What the Reader did</summary>';
+  h += '<div class="r-sub">Cleaned</div><ul><li>' + (cleanedBits.length ? 'Removed ' + esc(cleanedBits.join(', ')) : 'Nothing needed removing') + '</li>' +
+    (s.repeatedMessages ? '<li>' + s.repeatedMessages + ' repeated message(s) collapsed</li>' : '') + '</ul>';
+  if (r.corrections && r.corrections.length) {
+    h += '<div class="r-sub">Spelling fixed</div><ul>' + r.corrections.map(c => '<li>' + esc(c.from) + ' → ' + esc(c.to) + '</li>').join('') + '</ul>';
+  }
+  if (b.leftOut && b.leftOut.length) h += '<div class="r-sub">Not used (no matching field)</div><ul>' + b.leftOut.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+  h += '<div class="r-sub">Cleaned message</div><pre>' + esc(b.text || r.cleaned) + '</pre></details>';
+  out.innerHTML = h;
+  out.querySelectorAll('[data-blk]').forEach(btn => btn.addEventListener('click', () => {
+    applyBlock(+btn.getAttribute('data-blk'));
+  }));
+}
+
+/* ── MEDIA ── */
+let items = []; // {id,file,kind,url,status,progress,cloudUrl,folder,error}
+let nextId = 1;
+const drop = $('drop-zone'), fileInput = $('file-input');
+
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag-over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag-over'); }));
+drop.addEventListener('drop', e => { if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files); });
+// a missed drop must not navigate away from the page
+['dragover', 'drop'].forEach(ev => window.addEventListener(ev, e => {
+  if (e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], 'Files') >= 0 && !drop.contains(e.target)) e.preventDefault();
+}));
+fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value = ''; });
+
+function addFiles(list) {
+  const rejected = []; let dupes = 0; let added = 0;
+  Array.prototype.forEach.call(list, f => {
+    const isImg = /^image\//.test(f.type) || /\.(jpe?g|png|webp|gif|heic|heif|avif)$/i.test(f.name);
+    const isVid = /^video\//.test(f.type) || /\.(mp4|mov|m4v|webm|avi|mkv)$/i.test(f.name);
+    if (!isImg && !isVid) { rejected.push(f.name); return; }
+    if (items.some(x => x.file.name === f.name && x.file.size === f.size && x.file.lastModified === f.lastModified)) { dupes++; return; }
+    const it = { id: nextId++, file: f, kind: isVid ? 'video' : 'image', url: '', status: 'ready', progress: 0, cloudUrl: '', folder: '', error: '' };
+    try { it.url = URL.createObjectURL(f); } catch (e) { /* no preview */ }
+    items.push(it); added++;
+  });
+  renderMedia();
+  const bits = [];
+  if (rejected.length) bits.push(rejected.length + ' skipped (not a photo or video)');
+  if (dupes) bits.push(dupes + ' already added');
+  if (bits.length) toast(bits.join(' · '));
+  else if (added) toast(added + ' added');
+}
+
+function mb(n) { return (n / 1048576); }
+function sizeLabel(f) { const m = mb(f.size); return m >= 1 ? m.toFixed(1) + ' MB' : Math.max(1, Math.round(f.size / 1024)) + ' KB'; }
+
+function tileHTML(it, idx, kind) {
+  const warn = it.kind === 'video' ? mb(it.file.size) > VID_MAX_MB : false;
+  let h = '<div class="tile ' + it.status + '" data-id="' + it.id + '" tabindex="0" role="listitem" aria-label="' + esc(it.file.name) + ', position ' + (idx + 1) + '">';
+  if (it.kind === 'video') h += (it.url ? '<video src="' + it.url + '#t=0.1" muted playsinline preload="metadata"></video>' : '<div class="nopreview">' + esc(it.file.name) + '</div>') + '<div class="tile-play">▶</div>';
+  else h += it.url ? '<img src="' + it.url + '" alt="" draggable="false" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="nopreview" style="display:none">' + esc(it.file.name) + '<br>(no preview)</div>' : '<div class="nopreview">' + esc(it.file.name) + '</div>';
+  h += '<div class="tile-badge">' + (it.kind === 'video' ? 'Video' : (idx === 0 ? 'Cover' : (idx + 1))) + '</div>';
+  if (warn) h += '<div class="tile-warn">&gt;' + VID_MAX_MB + ' MB</div>';
+  if (it.kind === 'image' && idx > 0) h += '<button type="button" class="tile-cover" data-act="cover" title="Make cover" aria-label="Make cover">★</button>';
+  h += '<button type="button" class="tile-x" data-act="rm" title="Remove" aria-label="Remove">&times;</button>';
+  h += '<div class="tile-grip" data-grip title="Drag to reorder">⋯</div>';
+  h += '<div class="tile-meta">' + sizeLabel(it.file) + '</div>';
+  h += '<div class="tile-bar"><i style="width:' + Math.round(it.progress) + '%"></i></div>';
+  return h + '</div>';
+}
+
+function renderMedia() {
+  const photos = items.filter(i => i.kind === 'image'), vids = items.filter(i => i.kind === 'video');
+  $('photo-grid').innerHTML = photos.map((it, i) => tileHTML(it, i)).join('');
+  $('video-grid').innerHTML = vids.map((it, i) => tileHTML(it, i)).join('');
+  $('photos-label').style.display = photos.length ? 'block' : 'none';
+  $('videos-label').style.display = vids.length ? 'block' : 'none';
+  $('order-hint').style.display = photos.length > 1 ? 'block' : 'none';
+  drop.classList.toggle('compact', items.length > 0);
+  $('dz-title').textContent = items.length ? 'Drop more photos or videos' : 'Drag & drop photos and videos here';
+  const big = photos.filter(p => mb(p.file.size) > IMG_MAX_MB).length;
+  $('media-meta').textContent = items.length ? (photos.length + ' photo' + (photos.length === 1 ? '' : 's') + (vids.length ? ' · ' + vids.length + ' video' + (vids.length === 1 ? '' : 's') : '') + (big ? ' · ' + big + ' large photo(s) will be shrunk before upload' : '')) : '';
+  refreshBar();
+}
+// order shown/stored: photos in their order, then videos
+function ordered() { return items.filter(i => i.kind === 'image').concat(items.filter(i => i.kind === 'video')); }
+
+['photo-grid', 'video-grid'].forEach(gid => {
+  const g = $(gid);
+  g.setAttribute('role', 'list');
+  g.addEventListener('click', e => {
+    const btn = e.target.closest('[data-act]'); if (!btn) return;
+    const tile = btn.closest('.tile'); const id = +tile.getAttribute('data-id');
+    const idx = items.findIndex(x => x.id === id); if (idx < 0) return;
+    if (btn.getAttribute('data-act') === 'rm') {
+      try { URL.revokeObjectURL(items[idx].url); } catch (er) { }
+      items.splice(idx, 1);
+    } else {
+      const it = items.splice(idx, 1)[0];
+      const firstImg = items.findIndex(x => x.kind === 'image');
+      items.splice(firstImg < 0 ? 0 : firstImg, 0, it);
+    }
+    renderMedia();
+  });
+  g.addEventListener('keydown', e => {
+    const tile = e.target.closest && e.target.closest('.tile'); if (!tile || e.target !== tile) return;
+    const id = +tile.getAttribute('data-id');
+    if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); const i = items.findIndex(x => x.id === id); if (i >= 0) { items.splice(i, 1); renderMedia(); } return; }
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && (e.altKey || e.shiftKey)) {
+      e.preventDefault();
+      const kind = items.find(x => x.id === id).kind;
+      const grp = items.filter(x => x.kind === kind); const gi = grp.findIndex(x => x.id === id);
+      const gj = gi + (e.key === 'ArrowLeft' ? -1 : 1); if (gj < 0 || gj >= grp.length) return;
+      const a = items.indexOf(grp[gi]), b = items.indexOf(grp[gj]);
+      const t = items[a]; items[a] = items[b]; items[b] = t; renderMedia();
+      const again = g.querySelector('.tile[data-id="' + id + '"]'); if (again) again.focus();
+    }
+  });
+  attachSorter(g);
+});
+
+/* Pointer-based sorter (mouse: drag the tile; touch: drag the ⋯ handle so scrolling still works) */
+function attachSorter(grid) {
+  let drag = null;
+  grid.addEventListener('pointerdown', e => {
+    if (e.button !== undefined && e.button !== 0 && e.pointerType === 'mouse') return;
+    if (e.target.closest('[data-act]')) return;
+    const tile = e.target.closest('.tile'); if (!tile || tile.classList.contains('uploading')) return;
+    const isTouch = e.pointerType === 'touch' || e.pointerType === 'pen';
+    if (isTouch && !e.target.closest('[data-grip]')) return;
+    drag = { tile: tile, sx: e.clientX, sy: e.clientY, started: false, pid: e.pointerId, ghost: null, off: null };
+    if (isTouch) { e.preventDefault(); }
+    try { grid.setPointerCapture(e.pointerId); } catch (er) { }
+  });
+  grid.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.pid) return;
+    if (!drag.started) {
+      if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 6) return;
+      drag.started = true;
+      const r = drag.tile.getBoundingClientRect();
+      drag.off = { x: e.clientX - r.left, y: e.clientY - r.top };
+      const g = drag.tile.cloneNode(true);
+      g.classList.add('ghost'); g.style.width = r.width + 'px'; g.style.height = r.height + 'px';
+      document.body.appendChild(g); drag.ghost = g;
+      drag.tile.classList.add('dragging'); document.body.classList.add('is-dragging');
+    }
+    e.preventDefault();
+    drag.ghost.style.left = (e.clientX - drag.off.x) + 'px';
+    drag.ghost.style.top = (e.clientY - drag.off.y) + 'px';
+    // find the tile under the pointer and move the placeholder before/after it
+    const others = Array.prototype.filter.call(grid.children, t => t !== drag.tile);
+    let target = null, after = false;
+    for (let i = 0; i < others.length; i++) {
+      const r = others[i].getBoundingClientRect();
+      if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) { target = others[i]; after = e.clientX > r.left + r.width / 2; break; }
+    }
+    if (target) { if (after) target.after(drag.tile); else target.before(drag.tile); }
+    // autoscroll near edges
+    if (e.clientY < 70) window.scrollBy(0, -14); else if (e.clientY > innerHeight - 90) window.scrollBy(0, 14);
+  });
+  const end = e => {
+    if (!drag || (e && e.pointerId !== drag.pid)) return;
+    const d = drag; drag = null;
+    try { grid.releasePointerCapture(d.pid); } catch (er) { }
+    if (!d.started) return;
+    if (d.ghost) d.ghost.remove();
+    document.body.classList.remove('is-dragging');
+    const ids = Array.prototype.map.call(grid.children, t => +t.getAttribute('data-id'));
+    const kind = (items.find(x => x.id === ids[0]) || {}).kind;
+    const others = items.filter(x => x.kind !== kind);
+    const mine = ids.map(id => items.find(x => x.id === id)).filter(Boolean);
+    items = kind === 'video' ? others.concat(mine) : mine.concat(others);
+    renderMedia();
+  };
+  grid.addEventListener('pointerup', end);
+  grid.addEventListener('pointercancel', end);
+  grid.addEventListener('contextmenu', e => { if (drag && drag.started) e.preventDefault(); });
+}
+
+/* ── Upload (Cloudinary unsigned, with progress) ── */
+function slugCode(code) { return code.trim().replace(/[\/\\]/g, '-').replace(/\s+/g, '-'); }
 
 // Convert the typed code to the deck's short MEDIA_DB key (mirrors resolveMediaKey in index.html)
 function toMediaKey(raw) {
@@ -463,125 +1980,294 @@ function toMediaKey(raw) {
   return raw.replace(/\s*-\s*/g, '-').replace(/\s+/g, '');
 }
 
-async function cloudinaryUpload(file, folder, isVideo){
-  const url = 'https://api.cloudinary.com/v1_1/' + CLOUD + '/' + (isVideo ? 'video' : 'image') + '/upload';
-  const fd = new FormData();
-  fd.append('file', file);
-  fd.append('upload_preset', PRESET);
-  fd.append('folder', folder);
-  const res = await fetch(url, { method: 'POST', body: fd });
-  const data = await res.json();
-  if (!res.ok || data.error) throw new Error((data.error && data.error.message) || ('HTTP ' + res.status));
-  return data.secure_url;
+function shrinkImage(file) {
+  // only when big; falls back to the original if the browser cannot decode it (e.g. HEIC)
+  return new Promise(resolve => {
+    if (mb(file.size) <= 4 || !/^image\/(jpeg|png|webp)/.test(file.type)) return resolve(file);
+    const u = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => {
+      try {
+        const max = 2400; const sc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+        if (sc === 1 && mb(file.size) <= IMG_MAX_MB) { URL.revokeObjectURL(u); return resolve(file); }
+        const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * sc); c.height = Math.round(img.naturalHeight * sc);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob(b => { URL.revokeObjectURL(u); resolve(b && b.size < file.size ? new File([b], file.name.replace(/\.\w+$/, '') + '.jpg', { type: 'image/jpeg' }) : file); }, 'image/jpeg', 0.88);
+      } catch (e) { URL.revokeObjectURL(u); resolve(file); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(u); resolve(file); };
+    img.src = u;
+  });
+}
+
+function cloudinaryUpload(file, folder, isVideo, onProgress) {
+  return new Promise((resolve, reject) => {
+    const url = 'https://api.cloudinary.com/v1_1/' + CLOUD + '/' + (isVideo ? 'video' : 'image') + '/upload';
+    const fd = new FormData();
+    fd.append('file', file); fd.append('upload_preset', PRESET); fd.append('folder', folder);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    xhr.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+    xhr.onerror = () => reject(new Error('network error'));
+    xhr.ontimeout = () => reject(new Error('timed out'));
+    xhr.onload = () => {
+      let data = {}; try { data = JSON.parse(xhr.responseText); } catch (e) { }
+      if (xhr.status >= 200 && xhr.status < 300 && data.secure_url) resolve(data.secure_url);
+      else reject(new Error((data.error && data.error.message) || ('HTTP ' + xhr.status)));
+    };
+    xhr.send(fd);
+  });
+}
+
+function paintItem(it) {
+  const t = document.querySelector('.tile[data-id="' + it.id + '"]'); if (!t) return;
+  t.className = 'tile ' + it.status;
+  const bar = t.querySelector('.tile-bar i'); if (bar) bar.style.width = Math.round(it.progress) + '%';
+}
+
+/* ── ACTION BAR / VALIDATION ── */
+function missingRequired() {
+  const m = [];
+  if (!val('prop-code')) m.push(['prop-code', ROOM ? 'Room Code' : 'Property Code']);
+  if (!val('f-loc')) m.push(['f-loc', 'Location']);
+  if (!val('f-config')) m.push(['f-config', ROOM ? 'Occupancy' : 'Configuration']);
+  if (!val('f-rent')) m.push(['f-rent', ROOM ? 'Rent per person' : 'Rent']);
+  return m;
+}
+function refreshBar() {
+  const miss = missingRequired();
+  const nCheck = Object.keys(fstate).filter(id => fstate[id].kind === 'check' || fstate[id].kind === 'conflict').length;
+  const photos = items.filter(i => i.kind === 'image').length, vids = items.filter(i => i.kind === 'video').length;
+  let s = '';
+  if (miss.length) s = 'Still needed: <b>' + esc(miss.map(x => x[1]).join(', ')) + '</b>';
+  else s = 'Ready to review';
+  s += ' · ' + photos + ' photo' + (photos === 1 ? '' : 's') + (vids ? ' + ' + vids + ' video' : '');
+  if (nCheck) s += ' · <b>' + nCheck + '</b> to check';
+  $('action-status').innerHTML = s;
+}
+function setStatus(kind, msg) {
+  const el = $('status'); el.className = 'status ' + kind; el.textContent = msg;
+}
+let toastT;
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ── REVIEW SHEET ── */
+const sheet = $('sheet');
+let busy = false;
+function openSheet() { sheet.classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeSheet() { if (busy) return; sheet.classList.remove('open'); document.body.style.overflow = ''; }
+$('sheet-x').addEventListener('click', closeSheet);
+$('sheet-back').addEventListener('click', closeSheet);
+sheet.addEventListener('click', e => { if (e.target === sheet) closeSheet(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && sheet.classList.contains('open')) closeSheet(); });
+
+$('upload-btn').addEventListener('click', reviewListing);
+
+function reviewListing() {
+  setStatus('info', '');
+  $('result').style.display = 'none';
+  const miss = missingRequired();
+  if (miss.length) {
+    setStatus('error', 'Please fill: ' + miss.map(x => x[1]).join(', ') + '.');
+    const el = $(miss[0][0]); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(() => el.focus({ preventScroll: true }), 300);
+    return;
+  }
+  const rent = val('f-rent');
+  if (!/^\d[\d, ]*$/.test(rent)) {
+    setStatus('error', 'Rent must be a number (got "' + rent + '").');
+    $('f-rent').scrollIntoView({ block: 'center', behavior: 'smooth' }); return;
+  }
+  buildReview();
+  openSheet();
+}
+
+function buildReview() {
+  const ph = items.filter(i => i.kind === 'image'), vd = items.filter(i => i.kind === 'video');
+  const cover = ph[0];
+  let h = '';
+  h += '<div class="rv-card"><div class="rv-cover">' + (cover && cover.url ? '<img src="' + cover.url + '" alt="">' : 'No photo') + '</div><div class="rv-card-body">';
+  h += '<div class="rv-name">' + esc(val('f-config')) + (ROOM && val('f-flat') ? ' in ' + esc(val('f-flat')) : '') + (val('f-building') ? ' · ' + esc(val('f-building')) : '') + '</div>';
+  h += '<div class="rv-line">' + esc(val('f-loc')) + '</div>';
+  h += '<div class="rv-line">' + esc(val('prop-code')) + '</div>';
+  h += '<div class="rv-rent">₹' + esc(val('f-rent')) + ' <small>/ month' + (ROOM ? ' per person' : '') + '</small></div></div></div>';
+
+  // checks
+  const issues = [];
+  Object.keys(fstate).forEach(id => {
+    const st = fstate[id];
+    if (st.kind === 'conflict') issues.push({ lvl: 'block', t: FIELD_NAME[ID_TO_KEY[id]] + ' — the message disagreed with itself (' + st.options.join(' / ') + '); it is blank.' });
+    else if (st.kind === 'check') issues.push({ lvl: 'warn', t: FIELD_NAME[ID_TO_KEY[id]] + ': ' + st.msg });
+  });
+  if (lastRead && currentBlock) {
+    const b = currentBlock;
+    if (b.kind === 'requirement') issues.push({ lvl: 'block', t: 'The source message looks like a requirement, not a listing.' });
+    if (b.isSale) issues.push({ lvl: 'block', t: 'The source message looks like a sale post.' });
+    if (b.occupancy && !ROOM) issues.push({ lvl: 'warn', t: 'Shared / single-occupancy post — rent may be per person.' });
+    if (ROOM && b.kind === 'listing' && !b.occupancy) issues.push({ lvl: 'warn', t: 'The source message does not read like a room post.' });
+  }
+  if (!val('f-number') && !val('f-contact')) issues.push({ lvl: 'warn', t: 'No contact number or name.' });
+  if (!ph.length) issues.push({ lvl: 'warn', t: 'No photos — the listing will go in photoless.' });
+  const bigVid = vd.filter(v => mb(v.file.size) > VID_MAX_MB);
+  if (bigVid.length) issues.push({ lvl: 'warn', t: bigVid.length + ' video(s) over ' + VID_MAX_MB + ' MB — Cloudinary may reject them.' });
+  if (!issues.length) {
+    h += '<div class="rv-checks"><div class="rv-check good">Nothing flagged. Give the details one last look.</div></div>';
+  } else {
+    h += '<div class="rv-checks">' + issues.map(x => '<div class="rv-check ' + (x.lvl === 'block' ? 'block' : 'warn') + '">' + esc(x.t) + '</div>').join('');
+    h += '<div class="rv-check warn"><label><input type="checkbox" id="rv-ack"> I have checked these and want to add the listing</label></div></div>';
+  }
+
+  const row = (label, id) => {
+    const v = $(id).value.trim(); const st = fstate[id];
+    const cls = v ? (st && (st.kind === 'check' || st.kind === 'conflict') ? 'flagged' : '') : 'empty';
+    return '<div class="rv-row"><div class="rv-k">' + label + '</div><div class="rv-v ' + cls + '">' + (v ? esc(v) : '—') + (st && st.kind === 'check' ? '<span class="rv-why">' + esc(st.msg) + '</span>' : '') + '</div><button type="button" class="rv-edit" data-edit="' + id + '">Edit</button></div>';
+  };
+  h += '<div class="rv-group">Listing</div>';
+  (ROOM ? [['Room code', 'prop-code'], ['Location', 'f-loc'], ['Occupancy', 'f-config'], ['Flat type', 'f-flat'], ['Room area', 'f-area'], ['Furnishing', 'f-furn'], ['Parking', 'f-parking'], ['Rent / person', 'f-rent'], ['Deposit', 'f-deposit'], ['Pets', 'f-pets'], ['Flatmate pref.', 'f-tenant'], ['Possession', 'f-possession']]
+    : [['Property code', 'prop-code'], ['Location', 'f-loc'], ['Configuration', 'f-config'], ['Carpet area', 'f-area'], ['Furnishing', 'f-furn'], ['Parking', 'f-parking'], ['Rent', 'f-rent'], ['Deposit', 'f-deposit'], ['Pets', 'f-pets'], ['Tenant type', 'f-tenant'], ['Possession', 'f-possession']]).forEach(r => h += row(r[0], r[1]));
+  h += '<div class="rv-group">Client-facing text</div>';
+  [['Building', 'f-building'], ['Notes', 'f-notes'], ['Highlight', 'f-highlight']].forEach(r => h += row(r[0], r[1]));
+  h += '<div class="rv-group">Internal <small>clients never see these</small></div>';
+  [['Contact', 'f-contact'], ['Number', 'f-number'], ['Brokerage', 'f-brokerage'], ['Inspection', 'f-inspection'], ['Source', 'f-source']].forEach(r => h += row(r[0], r[1]));
+
+  h += '<div class="rv-group">Media <small>' + ph.length + ' photo' + (ph.length === 1 ? '' : 's') + (vd.length ? ' · ' + vd.length + ' video' : '') + ' · in this order</small></div>';
+  if (ph.length || vd.length) {
+    h += '<div class="rv-strip">' + ph.concat(vd).map((it, i) => '<div class="rv-thumb">' + (it.kind === 'video' ? (it.url ? '<video src="' + it.url + '#t=0.1" muted playsinline preload="metadata"></video>' : '') : (it.url ? '<img src="' + it.url + '" alt="">' : '')) + '<span>' + (it.kind === 'video' ? 'Video' : (i === 0 ? 'Cover' : i + 1)) + '</span></div>').join('') + '</div>';
+  } else h += '<div class="rv-line">None added.</div>';
+
+  $('sheet-body').innerHTML = h;
+  $('sheet-body').scrollTop = 0;
+  $('sheet-title').textContent = 'Review before adding';
+  $('sheet-foot').style.display = 'flex';
+  const confirm = $('sheet-confirm');
+  const ack = $('rv-ack');
+  confirm.disabled = !!ack; confirm.textContent = 'Confirm & add listing';
+  if (ack) ack.addEventListener('change', () => { confirm.disabled = !ack.checked; });
+  $('sheet-body').querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => {
+    closeSheet(); const el = $(b.getAttribute('data-edit'));
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(() => el.focus({ preventScroll: true }), 300);
+  }));
+}
+
+$('sheet-confirm').addEventListener('click', addListing);
+
+// Rooms: the flat the room sits in is kept in Notes (same sheet columns as flats)
+function roomNotes() {
+  const n = val('f-notes');
+  if (!ROOM) return n;
+  const flat = val('f-flat');
+  if (!flat) return n;
+  return 'Room in a ' + flat + (n ? '. ' + n : '');
 }
 
 async function addListing() {
-  const code   = val('prop-code');
-  const loc    = val('f-loc');
-  const config = val('f-config');
-  const rent   = val('f-rent');
-
-  // required-field check (the write endpoint enforces these too)
+  if (busy) return;
+  const code = val('prop-code'), loc = val('f-loc'), config = val('f-config'), rent = val('f-rent');
   const missing = [];
-  if (!code)   missing.push('Property Code');
-  if (!loc)    missing.push('Location');
-  if (!config) missing.push('Configuration');
-  if (!rent)   missing.push('Rent');
-  if (missing.length) { setStatus('error', 'Please fill: ' + missing.join(', ') + '.'); return; }
-  if (!/^\d[\d, ]*$/.test(rent)) { setStatus('error', 'Rent must be a number (got "' + rent + '").'); return; }
+  if (!code) missing.push(ROOM ? 'Room Code' : 'Property Code'); if (!loc) missing.push('Location'); if (!config) missing.push(ROOM ? 'Occupancy' : 'Configuration'); if (!rent) missing.push('Rent');
+  if (missing.length) { closeSheet(); setStatus('error', 'Please fill: ' + missing.join(', ') + '.'); return; }
+  if (!/^\d[\d, ]*$/.test(rent)) { closeSheet(); setStatus('error', 'Rent must be a number (got "' + rent + '").'); return; }
 
-  const btn = document.getElementById('upload-btn');
-  const progressWrap = document.getElementById('progress-wrap');
-  const progressFill = document.getElementById('progress-fill');
-  const progressLabel = document.getElementById('progress-label');
-  document.getElementById('result').style.display = 'none';
-  btn.disabled = true;
-  progressWrap.style.display = 'block';
-  setStatus('info', '');
+  busy = true;
+  const list = ordered();
+  const folder = (ROOM ? 'prithjyo/rooms/' : 'prithjyo/') + toMediaKey(code);
+  const confirmBtn = $('sheet-confirm'), backBtn = $('sheet-back');
+  confirmBtn.disabled = true; backBtn.disabled = true; $('sheet-x').disabled = true;
+  confirmBtn.textContent = 'Adding…';
+  $('sheet-title').textContent = 'Adding listing…';
 
-  // 1) Upload media to Cloudinary (optional — a listing can be added photoless)
-  let mediaValue = '';
-  try {
-    const folder = 'prithjyo/' + toMediaKey(code);
-    const total = photos.length + (videoFile ? 1 : 0);
-    const urls = [];
-    let done = 0;
-    for (let i = 0; i < photos.length; i++) {
-      progressLabel.textContent = `Uploading photo ${i + 1} of ${photos.length}...`;
-      progressFill.style.width = (total ? (done / total) * 100 : 0) + '%';
-      urls.push(await cloudinaryUpload(photos[i], folder, false));
-      done++;
+  const prog = document.createElement('div'); prog.id = 'up-box';
+  prog.innerHTML = '<div class="up-overall"><i id="up-bar"></i></div><div class="rv-line" id="up-label">Starting…</div>' +
+    list.map(it => '<div class="up-row"><div class="up-name">' + esc(it.file.name) + '</div><div class="up-st" id="up-' + it.id + '">waiting</div></div>').join('');
+  const body = $('sheet-body'); body.insertBefore(prog, body.firstChild); body.scrollTop = 0;
+
+  const setLabel = t => { const l = $('up-label'); if (l) l.textContent = t; };
+  const overall = () => {
+    if (!list.length) return;
+    const p = list.reduce((a, it) => a + (it.cloudUrl && it.folder === folder ? 100 : it.progress), 0) / list.length;
+    const b = $('up-bar'); if (b) b.style.width = Math.min(99, p) + '%';
+  };
+  const fail = (msg) => {
+    busy = false; backBtn.disabled = false; $('sheet-x').disabled = false;
+    confirmBtn.disabled = false; confirmBtn.textContent = 'Try again';
+    $('sheet-title').textContent = 'Not added';
+    const e = document.createElement('div'); e.className = 'rv-check block'; e.style.margin = '10px 0'; e.textContent = msg;
+    const old = $('up-err'); if (old) old.remove(); e.id = 'up-err'; prog.appendChild(e);
+  };
+
+  // 1) media → Cloudinary (3 at a time; already-uploaded files are reused on retry)
+  const todo = list.filter(it => !(it.cloudUrl && it.folder === folder));
+  list.forEach(it => { const s = $('up-' + it.id); if (s && it.cloudUrl && it.folder === folder) { s.textContent = 'done'; s.className = 'up-st ok'; } });
+  setLabel(todo.length ? 'Uploading ' + todo.length + ' file' + (todo.length === 1 ? '' : 's') + '…' : 'Saving listing to the sheet…');
+  let failure = null, cursor = 0;
+  async function worker() {
+    while (!failure && cursor < todo.length) {
+      const it = todo[cursor++]; const s = $('up-' + it.id);
+      it.status = 'uploading'; it.progress = 0; it.error = ''; paintItem(it); if (s) { s.textContent = '0%'; s.className = 'up-st'; }
+      try {
+        const f = it.kind === 'image' ? await shrinkImage(it.file) : it.file;
+        it.cloudUrl = await cloudinaryUpload(f, folder, it.kind === 'video', p => { it.progress = p * 100; if (s) s.textContent = Math.round(p * 100) + '%'; paintItem(it); overall(); });
+        it.folder = folder; it.status = 'done'; it.progress = 100; paintItem(it);
+        if (s) { s.textContent = 'done'; s.className = 'up-st ok'; } overall();
+      } catch (err) {
+        it.status = 'error'; it.error = err.message; paintItem(it);
+        if (s) { s.textContent = 'failed'; s.className = 'up-st err'; }
+        failure = failure || ('Upload failed for ' + it.file.name + ': ' + err.message);
+      }
     }
-    if (videoFile) {
-      progressLabel.textContent = 'Uploading video (this one can take a bit)...';
-      progressFill.style.width = (total ? (done / total) * 100 : 0) + '%';
-      urls.push(await cloudinaryUpload(videoFile, folder, true));
-      done++;
-    }
-    mediaValue = urls.join('|');
-  } catch (err) {
-    setStatus('error', 'Photo upload failed: ' + err.message + ' — nothing was written to the sheet.');
-    btn.disabled = false; progressWrap.style.display = 'none';
-    return;
   }
+  await Promise.all([worker(), worker(), worker()]);
+  if (failure) { fail(failure + ' — nothing was written to the sheet. Files already uploaded are kept, so Try again only resends what failed.'); return; }
 
-  // 2) Write the row to the sheet through the relay
-  progressFill.style.width = '100%';
-  progressLabel.textContent = 'Saving listing to the sheet...';
+  const mediaValue = list.map(it => it.cloudUrl).join('|');
 
+  // 2) write the row through the relay
+  setLabel('Saving listing to the sheet…'); const bar = $('up-bar'); if (bar) bar.style.width = '100%';
   const payload = {
     password: PASSWORD,
     code: code, loc: loc, config: config, area: val('f-area'),
     furn: val('f-furn'), parking: val('f-parking'), rent: rent, deposit: val('f-deposit'),
     pets: val('f-pets'), tenantType: val('f-tenant'), possession: val('f-possession'),
-    notes: val('f-notes'), building: val('f-building'), highlight: val('f-highlight'),
+    notes: roomNotes(), building: val('f-building'), highlight: val('f-highlight'),
     contact: val('f-contact'), number: val('f-number'), brokerage: val('f-brokerage'),
     inspection: val('f-inspection'), source: val('f-source'),
     media: mediaValue
   };
-
   try {
-    const res = await fetch(ADD_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    const res = await fetch(ADD_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     const data = await res.json();
     if (!data || !data.success) {
       const why = (data && data.error) || ('server returned ' + res.status);
-      setStatus('error', 'Not added: ' + why + (mediaValue ? '  (photos uploaded to Cloudinary, but no row was written — fix and resubmit.)' : ''));
-      btn.disabled = false; progressWrap.style.display = 'none';
+      fail('Not added: ' + why + (mediaValue ? ' (photos are uploaded and kept — fix the problem and press Try again; nothing is re-sent.)' : ''));
       return;
     }
-    progressWrap.style.display = 'none';
-    setStatus('success', '');
-    document.getElementById('result-title').textContent = '✓ Listing added';
-    document.getElementById('result-note').textContent =
-      `"${data.code}" added to ${data.tab} (row ${data.rowNumber})${mediaValue ? ' with its photos' : ' — no photos yet'}. It's live — refresh the deck to see it.`;
-    document.getElementById('result').style.display = 'block';
-    btn.disabled = false;
+    busy = false; backBtn.disabled = false; $('sheet-x').disabled = false;
+    sheet.classList.remove('open'); document.body.style.overflow = '';
+    $('result-title').textContent = '✓ Listing added';
+    $('result-note').textContent = '"' + data.code + '" added to ' + data.tab + ' (row ' + data.rowNumber + ')' + (mediaValue ? ' with its media' : ' — no photos yet') + '. It\'s live — refresh the deck to see it.';
+    $('result').style.display = 'block';
+    $('result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    $('action-bar').style.display = 'none';
   } catch (err) {
-    setStatus('error', 'Could not reach the sheet: ' + err.message + (mediaValue ? '  (photos uploaded, but no row was written.)' : ''));
-    btn.disabled = false; progressWrap.style.display = 'none';
+    fail('Could not reach the sheet: ' + err.message + (mediaValue ? ' (media uploaded, but no row was written — press Try again.)' : ''));
   }
 }
 
-function setStatus(kind, msg) {
-  const el = document.getElementById('status');
-  el.className = 'status ' + kind;
-  el.textContent = msg;
-}
-
 function resetForm() {
-  ['prop-code','f-loc','f-config','f-area','f-furn','f-parking','f-rent','f-deposit','f-pets','f-tenant','f-possession','f-building','f-notes','f-highlight','f-contact','f-number','f-brokerage','f-inspection','f-source']
-    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  photos = []; videoFile = null;
-  document.getElementById('file-input').value = '';
-  renderGrid(); renderVideo();
-  document.getElementById('result').style.display = 'none';
+  ALL_IDS.forEach(id => { const el = $(id); if (el) el.value = ''; delete fstate[id]; touched[id] = false; paintField(id); });
+  items.forEach(i => { try { URL.revokeObjectURL(i.url); } catch (e) { } });
+  items = []; fileInput.value = ''; renderMedia();
+  msgInput.value = ''; $('read-btn').disabled = true; $('reader-out').innerHTML = ''; lastRead = null;
+  $('result').style.display = 'none'; $('action-bar').style.display = 'block';
   setStatus('info', '');
+  refreshBar();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+renderMedia();
+refreshBar();
+
 </script>
 </body>
 </html>
