@@ -1556,7 +1556,7 @@ return { read: read, _inr: inr, _findPhones: findPhones, _extract: extractFields
 </script>
 <script>
 /* ════════════════ PRITHJYO ADD-LISTING — UI (build v3) ════════════════ */
-const PASSWORD = 'prithjyo2026';
+let PASSWORD = ''; // typed on the lock screen and checked by the Rooms script; never stored in this page
 const CLOUD = 'dayfllzwe';
 const PRESET = 'prithjyo_listings';
 const MODE = 'room'; // 'flat' | 'room'
@@ -1569,9 +1569,22 @@ function val(id) { const el = $(id); return el ? el.value.trim() : ''; }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
 /* ── LOCK ── */
-function unlock() {
+async function unlock() {
   const pw = $('lock-pw').value;
-  if (pw === PASSWORD) {
+  if (!pw) return;
+  $('lock-error').textContent = 'Checking…';
+  let ok = false;
+  try {
+    const res = await fetch(ADD_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'check', password: pw }) });
+    const data = await res.json();
+    ok = !!(data && data.success);
+  } catch (e) {
+    $('lock-error').textContent = 'Could not reach the server. Check your connection and try again.';
+    return;
+  }
+  if (ok) {
+    PASSWORD = pw;
+    $('lock-error').textContent = '';
     $('lock').style.display = 'none';
     $('app').style.display = 'block';
     $('action-bar').style.display = 'block';
