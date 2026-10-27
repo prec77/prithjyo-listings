@@ -3,7 +3,7 @@
 // No npm dependencies — uses the runtime's built-in fetch.
 
 export default async function handler(req, res) {
-  const SCRIPT_URL = 'PASTE_ROOMS_EXEC_URL_HERE'; // the /exec URL of the ROOMS Apps Script deployment
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHR6MRmaVrcR6FgGyxTQJXupPBy-lDKvMgF1rfas5JHly0N81pCaheu9AhBEElJCRf/exec'; // the /exec URL of the ROOMS Apps Script deployment
 
   if (req.method !== 'POST') {
     res.status(405).json({ success: false, error: 'Method not allowed' });
